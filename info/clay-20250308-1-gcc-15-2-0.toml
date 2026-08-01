@@ -168,7 +168,7 @@ cmake --build build
 sudo cmake --build build --target install
 popd
 
-wget -q -O scip.sh https://scipopt.org/download/release/SCIPOptSuite-9.2.3-Linux-ubuntu24.sh
+wget -q -O scip.sh https://github.com/scipopt/scip/releases/download/v923/SCIPOptSuite-9.2.3-Linux-ubuntu24.sh
 chmod +x scip.sh
 ./scip.sh --skip-license --include-subdir --prefix=scip
 sudo cp -a --no-preserve=ownership scip/*/* /usr/local

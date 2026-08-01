@@ -11,6 +11,7 @@ sudo apt-get install -y rustc cargo git
 cd /tmp
 git clone https://github.com/noirotm/fishr
 cd fishr
+git checkout --detach 6dd9c0346174d6195ce81623b52db95fe438245e
 cargo build --release
 sudo cp target/release/fishr /usr/local/bin
 """

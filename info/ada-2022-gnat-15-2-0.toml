@@ -44,10 +44,8 @@ sudo unzip alr.zip -d /usr/local bin/alr
 
 alr -n --force toolchain --select gprbuild=${AC2025_GPRBUILD_VERSION}
 
-GPRBUILD_LATEST_VERSION=$(curl -sS 'https://api.launchpad.net/1.0/ubuntu/+archive/primary?ws.op=getPublishedSources&source_name=gprbuild&exact_match=true&distro_series=https://api.launchpad.net/1.0/ubuntu/plucky' | sed 's/,/\\n/g' | grep -m 1 version | awk '{ print $2 }' | sed 's/\"//g')
-wget -q -O gprbuild.tar.xz https://launchpad.net/ubuntu/+archive/primary/+files/gprbuild_${GPRBUILD_LATEST_VERSION}.debian.tar.xz
-
-tar xf gprbuild.tar.xz
+mkdir -p debian/patches
+wget -q -O debian/patches/adapt-to-private-timeval.diff https://sources.debian.org/data/main/g/gprbuild/2025.0.0-4/debian/patches/adapt-to-private-timeval.diff
 
 popd
 

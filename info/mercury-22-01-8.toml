@@ -8,14 +8,33 @@ mmc -o a.out -O 5 main
 execution = ["./a.out"]
 install = """
 sudo apt update
-sudo apt-get install -y wget ca-certificates
+sudo apt-get install -y wget ca-certificates libhwloc-dev libreadline-dev
 cd /tmp
-wget https://paul.bone.id.au/paul.asc
-sudo cp paul.asc /etc/apt/trusted.gpg.d/paulbone.asc
-echo \"deb http://dl.mercurylang.org/deb/ noble main\" | sudo tee /etc/apt/sources.list.d/mercury.list
-echo \"deb-src http://dl.mercurylang.org/deb/ noble main\" | sudo tee -a /etc/apt/sources.list.d/mercury.list
-sudo apt update
-sudo apt-get install -y mercury-recommended
+
+AC_MERCURY_VERSION=22.01.8-1~noble
+AC_MERCURY_PACKAGES=(
+  mercury-gc_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-gc-dev_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-tools_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-hlc_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-hlc-dev_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-hlcpar_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-hlcpar-dev_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-llc_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-llc-dev_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-llcpar_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-llcpar-dev_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-devel_${AC_MERCURY_VERSION}_amd64.deb
+  mercury-docs_${AC_MERCURY_VERSION}_all.deb
+  mercury-recommended_${AC_MERCURY_VERSION}_amd64.deb
+)
+
+for package in \"${AC_MERCURY_PACKAGES[@]}\"
+do
+  wget -q \"https://dl.mercurylang.org/deb/pool/main/m/mercury/${package}\"
+done
+
+sudo apt-get install -y ./mercury-*.deb
 """
 
 [[license]]

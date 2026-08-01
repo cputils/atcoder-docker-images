@@ -10,7 +10,7 @@ execution = [
   "Main.pl",
 ]
 install = """
-sudo apt install -y perl=5.38.2-3.2ubuntu0.2
+sudo apt install -y perl=5.38.2-3.2ubuntu0.3
 """
 
 [[license]]

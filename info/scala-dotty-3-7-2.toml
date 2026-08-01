@@ -12,12 +12,11 @@ execution = [
 ]
 install = """
 AC_SCALA_VERSION=3.7.2
+AC_SCALA_CLI_VERSION=1.9.1
+AC_SBT_VERSION=1.11.6
 
 sudo apt-get update
 sudo apt-get install -y apt-transport-https gnupg
-
-curl -sS \"https://virtuslab.github.io/scala-cli-packages/KEY.gpg\" | sudo gpg --dearmor  -o /etc/apt/trusted.gpg.d/scala-cli.gpg 2>/dev/null
-sudo curl -s --compressed -o /etc/apt/sources.list.d/scala_cli_packages.list \"https://virtuslab.github.io/scala-cli-packages/debian/scala_cli_packages.list\"
 
 echo \"deb https://repo.scala-sbt.org/scalasbt/debian all main\" | sudo tee /etc/apt/sources.list.d/sbt.list
 echo \"deb https://repo.scala-sbt.org/scalasbt/debian /\" | sudo tee /etc/apt/sources.list.d/sbt_old.list
@@ -25,9 +24,13 @@ curl -sL \"https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A8
 sudo chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg
 
 sudo apt-get update
-sudo apt-get install -y sbt openjdk-21-jdk-headless scala-cli ansifilter
+sudo apt-get install -y sbt openjdk-21-jdk-headless ansifilter
 
-AC_SBT_VERSION=\"$(dpkg-query -W -f='${Version}' sbt)\"
+pushd /tmp
+wget -q -O scala-cli.gz https://github.com/VirtusLab/scala-cli/releases/download/v${AC_SCALA_CLI_VERSION}/scala-cli-x86_64-pc-linux.gz
+gzip -d scala-cli.gz
+sudo install scala-cli /usr/local/bin/scala-cli
+popd
 
 # install library
 pushd /tmp
