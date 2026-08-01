@@ -1,0 +1,24 @@
+language = "Lazy K"
+display = "Lazy K (irori v1.0.0)"
+filename = "Main.lazy"
+object = "Main.lazy"
+compile = """
+timeout 0.01 lazyk -v0 Main.lazy > /dev/null || if [ $? -ne 124 ]; then rm Main.lazy; fi
+"""
+execution = [
+  "lazyk",
+  "Main.lazy",
+]
+install = """
+sudo apt update && sudo apt install -y gcc make wget
+cd /tmp
+wget https://github.com/irori/lazyk/archive/refs/tags/v1.0.0.tar.gz
+tar xvf v1.0.0.tar.gz
+cd lazyk-1.0.0
+make
+sudo make install
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/irori/lazyk/blob/v1.0.0/LICENSE"

@@ -1,0 +1,24 @@
+language = "dc"
+display = "dc 1.5.2 (GNU bc 1.08.2)"
+filename = "Main.dc"
+execution = [
+  "dc",
+  "-f",
+  "Main.dc",
+]
+install = """
+VERSION=\"bc-1.08.2\"
+sudo apt update
+sudo apt install -y texinfo lzip
+cd /tmp
+wget \"https://ftpmirror.gnu.org/gnu/bc/${VERSION}.tar.lz\"
+tar --lzip -xvf \"${VERSION}.tar.lz\"
+cd \"${VERSION}\"
+./configure
+make
+sudo make install
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://www.gnu.org/software/bc/"

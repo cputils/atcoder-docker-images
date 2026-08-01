@@ -1,0 +1,30 @@
+language = "Eiffel"
+display = "Eiffel (Liberty Eiffel 07829e3)"
+filename = "main.e"
+object = "a.out"
+compile = """
+se c main --boost -o a.out
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get update
+sudo apt-get install -y libgc-dev libcurl4-openssl-dev
+
+cd /tmp
+wget -nv -O liberty-eiffel.tar.gz https://github.com/LibertyEiffel/Liberty/archive/07829e3.tar.gz
+mkdir liberty-eiffel
+tar -C liberty-eiffel --strip-components=1 -xf liberty-eiffel.tar.gz
+
+export TERM=vt100
+export plain=TRUE
+cd liberty-eiffel
+sed -i 's@/usr/lib@$USRDIR/lib@;s@/usr/share@$USRDIR/share@;s/do_.*_doc$//;s/LOCAL_MAN_PATH]/LOCAL_MAN_PATH ]/;s/.*LOCAL_MAN_PATH$//' install.sh
+./install.sh
+yes '' | sudo ./install.sh -local_install
+sudo install -d /etc/xdg
+sudo ln -sfn /usr/local/etc/xdg/liberty-eiffel /etc/xdg/liberty-eiffel
+"""
+
+[[license]]
+name = "GPL-3.0-only"
+url = "https://github.com/LibertyEiffel/Liberty/blob/master/COPYING"

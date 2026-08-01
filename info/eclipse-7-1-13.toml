@@ -1,0 +1,51 @@
+language = "ECLiPSe"
+display = "ECLiPSe (ECLiPSe 7.1_13)"
+filename = "Main.ecl"
+object = "Main.eco"
+compile = """
+export PATH=$PATH:$HOME/.eclipse/bin/x86_64_linux
+echo \"compile('Main.ecl', [output: eco, debug: off])\" | eclipse 2> err-out
+if grep -q -E '^file Main.ecl:.*error:' err-out; then
+  rm Main.eco
+  cat err-out 1>&2
+fi
+"""
+execution = [
+  "eclipse",
+  "-f",
+  "Main.eco",
+  "-e",
+  "main",
+]
+install = """
+AC2025_ECLIPSE_VERSION=7.1_13
+
+ECLIPSE_DIR=\"$HOME/.eclipse\"
+mkdir \"$ECLIPSE_DIR\"
+
+cd /tmp
+wget -q https://eclipseclp.org/Distribution/Builds/${AC2025_ECLIPSE_VERSION}/x86_64_linux/eclipse_basic.tgz
+tar xpfz eclipse_basic.tgz -C \"$ECLIPSE_DIR\"
+
+pushd \"$ECLIPSE_DIR\"
+yes \"\"\"\" | ./RUNME --no-docs
+# skip tk and java installation
+popd
+
+# Install eplex
+wget -q https://eclipseclp.org/Distribution/Builds/${AC2025_ECLIPSE_VERSION}/x86_64_linux/if_osiclpcbc.tgz
+tar xpfz if_osiclpcbc.tgz -C \"$ECLIPSE_DIR\"
+"""
+
+[environment]
+PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.eclipse/bin/x86_64_linux"
+
+[[license]]
+name = "!License-14"
+url = "https://eclipseclp.org/licence.html"
+
+[library.eplex]
+
+[[library.eplex.license]]
+name = "!License-14"
+url = "file://judge/eclipse/lib/eplex.ecl"

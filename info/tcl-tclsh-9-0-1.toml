@@ -1,0 +1,42 @@
+language = "Tcl"
+display = "Tcl (tclsh 9.0.1)"
+filename = "Main.tcl"
+execution = [
+  "tclsh9.0",
+  "Main.tcl",
+]
+install = """
+cd /tmp
+
+# Install packages required for building
+sudo apt update
+sudo apt install -y curl gcc make zip zlib1g zlib1g-dev
+
+# Install Tcl
+curl -OL 'http://prdownloads.sourceforge.net/tcl/tcl9.0.1-src.tar.gz'
+tar -xzf 'tcl9.0.1-src.tar.gz'
+cd 'tcl9.0.1/unix'
+./configure --prefix=/usr/local
+make
+sudo make install
+cd ../..
+
+# Install Tcllib (standard library)
+curl -OL 'https://core.tcl-lang.org/tcllib/uv/tcllib-2.0.tar.gz'
+tar -xzf 'tcllib-2.0.tar.gz'
+cd 'tcllib-2.0'
+./configure --prefix=/usr/local
+sudo make install-libraries
+cd ..
+"""
+
+[[license]]
+name = "TCL"
+url = "https://www.tcl-lang.org/software/tcltk/license.html"
+
+[library.Tcllib]
+version = "2.0"
+
+[[library.Tcllib.license]]
+name = "!License-19"
+url = "https://core.tcl-lang.org/tcllib/doc/trunk/embedded/md/tcllib/files/devdoc/tcllib_license.md"

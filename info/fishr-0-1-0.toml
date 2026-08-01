@@ -1,0 +1,20 @@
+language = "><>"
+display = "><> (fishr 0.1.0)"
+filename = "Main.fish"
+execution = [
+  "fishr",
+  "Main.fish",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y rustc cargo git
+cd /tmp
+git clone https://github.com/noirotm/fishr
+cd fishr
+cargo build --release
+sudo cp target/release/fishr /usr/local/bin
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/noirotm/fishr/blob/master/LICENSE.md"

@@ -1,0 +1,45 @@
+language = "V"
+display = "V (0.4.10)"
+filename = "Main.v"
+object = "a.out"
+compile = """
+v -prod -cc clang -no-bounds-checking -o a.out Main.v
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get update
+sudo apt-get install -y git clang
+wget -q -O /tmp/v_linux.zip https://github.com/vlang/v/releases/download/0.4.10/v_linux.zip
+unzip /tmp/v_linux.zip
+pushd v
+sudo ./v symlink
+v install vsl
+v install vtl
+v install lemoncmd.proconio
+popd
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/vlang/v/blob/master/LICENSE"
+
+[library.vsl]
+version = ""
+
+[[library.vsl.license]]
+name = "MIT"
+url = "https://github.com/vlang/vsl/blob/master/LICENSE"
+
+[library.vtl]
+version = ""
+
+[[library.vtl.license]]
+name = "MIT"
+url = "https://github.com/vlang/vtl/blob/main/LICENSE"
+
+[library.proconio]
+version = ""
+
+[[library.proconio.license]]
+name = "MIT"
+url = "https://github.com/lemoncmd/proconio/blob/main/LICENSE"

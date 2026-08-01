@@ -1,0 +1,612 @@
+language = "OCaml"
+display = "OCaml (ocamlopt 5.3.0)"
+filename = "main.ml"
+object = "a.out"
+compile = """
+eval $(opam env) ocamlfind ocamlopt -O2 -o a.out \\
+main.ml -linkpkg -thread \\
+-package str,num,zarith,threads,containers,core,iter,batteries
+"""
+execution = ["./a.out"]
+install = """
+sudo apt install -y opam libgmp-dev pkg-config
+opam init -y
+opam switch create 5.3.0+flambda ocaml-variants.5.3.0+options ocaml-option-flambda.1
+eval $(opam env --switch=5.3.0+flambda)
+opam install num=1.6 zarith=1.14 containers=3.16 core=v0.17.1 iter=1.9 batteries=3.9.0 -y
+"""
+
+[[license]]
+name = "LGPL-2.1-or-later"
+url = "https://github.com/ocaml/ocaml/blob/trunk/LICENSE"
+exception = "OCaml-LGPL-linking-exception"
+
+[library.ocaml-option-flambda]
+version = "1"
+
+[[library.ocaml-option-flambda.license]]
+name = "CC0-1.0"
+url = "https://github.com/ocaml/opam-repository/blob/master/packages/ocaml-option-flambda/ocaml-option-flambda.1/opam"
+
+[library.num]
+version = "1.6"
+
+[[library.num.license]]
+name = "LGPL-2.1-only"
+url = "https://github.com/ocaml/num/blob/master/LICENSE"
+exception = "OCaml-LGPL-linking-exception"
+
+[library.zarith]
+version = "1.14"
+
+[[library.zarith.license]]
+name = "LGPL-2.0-only"
+url = "https://github.com/ocaml/Zarith/blob/master/LICENSE"
+exception = "OCaml-LGPL-linking-exception"
+
+[library.containers]
+version = "3.16"
+
+[[library.containers.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/c-cube/ocaml-containers/blob/master/LICENSE"
+
+[library.core]
+version = "v0.17.1"
+
+[[library.core.license]]
+name = "MIT"
+url = "https://github.com/janestreet/core/blob/master/LICENSE.md"
+
+[library.iter]
+version = "1.9"
+
+[[library.iter.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/c-cube/iter/blob/master/LICENSE"
+
+[library.batteries]
+version = "3.9.0"
+
+[[library.batteries.license]]
+name = "LGPL-2.1-or-later"
+url = "https://github.com/ocaml-batteries-team/batteries-included/blob/master/LICENSE"
+exception = "OCaml-LGPL-linking-exception"
+
+[library.base]
+version = "v0.17.3"
+indirect = true
+
+[[library.base.license]]
+name = "MIT"
+url = "https://github.com/janestreet/base/blob/master/LICENSE.md"
+
+[library.base_bigstring]
+version = "v0.17.0"
+indirect = true
+
+[[library.base_bigstring.license]]
+name = "MIT"
+url = "https://github.com/janestreet/base_bigstring/blob/master/LICENSE.md"
+
+[library.base_quickcheck]
+version = "v0.17.1"
+indirect = true
+
+[[library.base_quickcheck.license]]
+name = "MIT"
+url = "https://github.com/janestreet/base_quickcheck/blob/master/LICENSE.md"
+
+[library.bin_prot]
+version = "v0.17.0-1"
+indirect = true
+
+[[library.bin_prot.license]]
+name = "MIT"
+url = "https://github.com/janestreet/bin_prot/blob/master/LICENSE.md"
+
+[library.camlp-streams]
+version = "5.0.1"
+indirect = true
+
+[[library.camlp-streams.license]]
+name = "LGPL-2.1-only"
+url = "https://github.com/ocaml/camlp-streams/blob/trunk/LICENSE"
+exception = "OCaml-LGPL-linking-exception"
+
+[library.capitalization]
+version = "v0.17.0"
+indirect = true
+
+[[library.capitalization.license]]
+name = "MIT"
+url = "https://github.com/janestreet/capitalization/blob/master/LICENSE.md"
+
+[library.conf-gmp]
+version = "5"
+indirect = true
+
+[[library.conf-gmp.license]]
+name = "GPL-1.0-or-later"
+url = "https://github.com/ocaml/opam-repository/blob/master/packages/conf-gmp/conf-gmp.5/opam"
+
+[library.conf-pkg-config]
+version = "4"
+indirect = true
+
+[[library.conf-pkg-config.license]]
+name = "GPL-1.0-or-later"
+url = "https://github.com/ocaml/opam-repository/blob/master/packages/conf-pkg-config/conf-pkg-config.4/opam"
+
+[library.csexp]
+version = "1.5.2"
+indirect = true
+
+[[library.csexp.license]]
+name = "MIT"
+url = "https://github.com/ocaml-dune/csexp/blob/master/LICENSE.md"
+
+[library.dune]
+version = "3.20.0"
+indirect = true
+
+[[library.dune.license]]
+name = "MIT"
+url = "https://github.com/ocaml/dune/blob/main/LICENSE.md"
+
+[library.dune-configurator]
+version = "3.20.0"
+indirect = true
+
+[[library.dune-configurator.license]]
+name = "MIT"
+url = "https://github.com/ocaml/dune/blob/main/LICENSE.md"
+
+[library.either]
+version = "1.0.0"
+indirect = true
+
+[[library.either.license]]
+name = "MIT"
+url = "https://github.com/mirage/either/blob/main/LICENSE"
+
+[library.fieldslib]
+version = "v0.17.0"
+indirect = true
+
+[[library.fieldslib.license]]
+name = "MIT"
+url = "https://github.com/janestreet/fieldslib/blob/master/LICENSE.md"
+
+[library.gel]
+version = "v0.17.0"
+indirect = true
+
+[[library.gel.license]]
+name = "MIT"
+url = "https://github.com/janestreet/gel/blob/master/LICENSE.md"
+
+[library.int_repr]
+version = "v0.17.0"
+indirect = true
+
+[[library.int_repr.license]]
+name = "MIT"
+url = "https://github.com/janestreet/int_repr/blob/master/LICENSE.md"
+
+[library.jane-street-headers]
+version = "v0.17.0"
+indirect = true
+
+[[library.jane-street-headers.license]]
+name = "MIT"
+url = "https://github.com/janestreet/jane-street-headers/blob/master/LICENSE.md"
+
+[library.jst-config]
+version = "v0.17.0"
+indirect = true
+
+[[library.jst-config.license]]
+name = "MIT"
+url = "https://github.com/janestreet/jst-config/blob/master/LICENSE.md"
+
+[library.ocaml-compiler-libs]
+version = "v0.17.0"
+indirect = true
+
+[[library.ocaml-compiler-libs.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ocaml-compiler-libs/blob/master/LICENSE.md"
+
+[library.ocaml_intrinsics_kernel]
+version = "v0.17.1"
+indirect = true
+
+[[library.ocaml_intrinsics_kernel.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ocaml_intrinsics_kernel/blob/master/LICENSE.md"
+
+[library.ocamlfind]
+version = "1.9.8"
+indirect = true
+
+[[library.ocamlfind.license]]
+name = "MIT"
+url = "https://github.com/ocaml/ocamlfind/blob/master/LICENSE"
+
+[library.parsexp]
+version = "v0.17.0"
+indirect = true
+
+[[library.parsexp.license]]
+name = "MIT"
+url = "https://github.com/janestreet/parsexp/blob/master/LICENSE.md"
+
+[library.ppx_assert]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_assert.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_assert/blob/master/LICENSE.md"
+
+[library.ppx_base]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_base.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_base/blob/master/LICENSE.md"
+
+[library.ppx_bench]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_bench.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_bench/blob/master/LICENSE.md"
+
+[library.ppx_bin_prot]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_bin_prot.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_bin_prot/blob/master/LICENSE.md"
+
+[library.ppx_cold]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_cold.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_cold/blob/master/LICENSE.md"
+
+[library.ppx_compare]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_compare.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_compare/blob/master/LICENSE.md"
+
+[library.ppx_custom_printf]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_custom_printf.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_custom_printf/blob/master/LICENSE.md"
+
+[library.ppx_derivers]
+version = "1.2.1"
+indirect = true
+
+[[library.ppx_derivers.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/ocaml-ppx/ppx_derivers/blob/master/LICENSE.md"
+
+[library.ppx_diff]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_diff.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_diff/blob/master/LICENSE.md"
+
+[library.ppx_disable_unused_warnings]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_disable_unused_warnings.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_disable_unused_warnings/blob/master/LICENSE.md"
+
+[library.ppx_enumerate]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_enumerate.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_enumerate/blob/master/LICENSE.md"
+
+[library.ppx_expect]
+version = "v0.17.3"
+indirect = true
+
+[[library.ppx_expect.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_expect/blob/master/LICENSE.md"
+
+[library.ppx_fields_conv]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_fields_conv.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_fields_conv/blob/master/LICENSE.md"
+
+[library.ppx_fixed_literal]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_fixed_literal.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_fixed_literal/blob/master/LICENSE.md"
+
+[library.ppx_globalize]
+version = "v0.17.2"
+indirect = true
+
+[[library.ppx_globalize.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_globalize/blob/master/LICENSE.md"
+
+[library.ppx_hash]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_hash.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_hash/blob/master/LICENSE.md"
+
+[library.ppx_here]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_here.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_here/blob/master/LICENSE.md"
+
+[library.ppx_ignore_instrumentation]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_ignore_instrumentation.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_ignore_instrumentation/blob/master/LICENSE.md"
+
+[library.ppx_inline_test]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_inline_test.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_inline_test/blob/master/LICENSE.md"
+
+[library.ppx_jane]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_jane.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_jane/blob/master/LICENSE.md"
+
+[library.ppx_let]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_let.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_let/blob/master/LICENSE.md"
+
+[library.ppx_log]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_log.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_log/blob/master/LICENSE.md"
+
+[library.ppx_module_timer]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_module_timer.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_module_timer/blob/master/LICENSE.md"
+
+[library.ppx_optcomp]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_optcomp.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_optcomp/blob/master/LICENSE.md"
+
+[library.ppx_optional]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_optional.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_optional/blob/master/LICENSE.md"
+
+[library.ppx_pipebang]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_pipebang.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_pipebang/blob/master/LICENSE.md"
+
+[library.ppx_sexp_conv]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_sexp_conv.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_sexp_conv/blob/master/LICENSE.md"
+
+[library.ppx_sexp_message]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_sexp_message.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_sexp_message/blob/master/LICENSE.md"
+
+[library.ppx_sexp_value]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_sexp_value.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_sexp_value/blob/master/LICENSE.md"
+
+[library.ppx_stable]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_stable.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_stable/blob/master/LICENSE.md"
+
+[library.ppx_stable_witness]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_stable_witness.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_stable_witness/blob/master/LICENSE.md"
+
+[library.ppx_string]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_string.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_string/blob/master/LICENSE.md"
+
+[library.ppx_string_conv]
+version = "v0.17.0"
+indirect = true
+
+[[library.ppx_string_conv.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_string_conv/blob/master/LICENSE.md"
+
+[library.ppx_tydi]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_tydi.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_tydi/blob/master/LICENSE.md"
+
+[library.ppx_typerep_conv]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_typerep_conv.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_typerep_conv/blob/master/LICENSE.md"
+
+[library.ppx_variants_conv]
+version = "v0.17.1"
+indirect = true
+
+[[library.ppx_variants_conv.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppx_variants_conv/blob/master/LICENSE.md"
+
+[library.ppxlib]
+version = "0.36.0"
+indirect = true
+
+[[library.ppxlib.license]]
+name = "MIT"
+url = "https://github.com/ocaml-ppx/ppxlib/blob/main/LICENSE.md"
+
+[library.ppxlib_jane]
+version = "v0.17.4"
+indirect = true
+
+[[library.ppxlib_jane.license]]
+name = "MIT"
+url = "https://github.com/janestreet/ppxlib_jane/blob/master/LICENSE.md"
+
+[library.sexplib]
+version = "v0.17.0"
+indirect = true
+
+[[library.sexplib.license]]
+name = "MIT"
+url = "https://github.com/janestreet/sexplib/blob/master/LICENSE.md"
+
+[library.sexplib0]
+version = "v0.17.0"
+indirect = true
+
+[[library.sexplib0.license]]
+name = "MIT"
+url = "https://github.com/janestreet/sexplib0/blob/master/LICENSE.md"
+
+[library.splittable_random]
+version = "v0.17.0"
+indirect = true
+
+[[library.splittable_random.license]]
+name = "MIT"
+url = "https://github.com/janestreet/splittable_random/blob/master/LICENSE.md"
+
+[library.stdio]
+version = "v0.17.0"
+indirect = true
+
+[[library.stdio.license]]
+name = "MIT"
+url = "https://github.com/janestreet/stdio/blob/master/LICENSE.md"
+
+[library.stdlib-shims]
+version = "0.3.0"
+indirect = true
+
+[[library.stdlib-shims.license]]
+name = "LGPL-2.1-only"
+url = "https://github.com/ocaml/stdlib-shims/blob/master/LICENSE"
+exception = "OCaml-LGPL-linking-exception"
+
+[library.time_now]
+version = "v0.17.0"
+indirect = true
+
+[[library.time_now.license]]
+name = "MIT"
+url = "https://github.com/janestreet/time_now/blob/master/LICENSE.md"
+
+[library.typerep]
+version = "v0.17.1"
+indirect = true
+
+[[library.typerep.license]]
+name = "MIT"
+url = "https://github.com/janestreet/typerep/blob/master/LICENSE.md"
+
+[library.variantslib]
+version = "v0.17.0"
+indirect = true
+
+[[library.variantslib.license]]
+name = "MIT"
+url = "https://github.com/janestreet/variantslib/blob/master/LICENSE.md"

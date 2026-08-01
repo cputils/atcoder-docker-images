@@ -1,0 +1,78 @@
+language = "Emacs Lisp"
+display = "Emacs Lisp(Native Compile)(GNU Emacs 29.4)"
+filename = "Main.el"
+object = "Main.eln"
+compile = """
+emacs --batch -f package-initialize --eval '(native-compile \"Main.el\" (expand-file-name \"Main.eln\"))'
+"""
+execution = [
+  "emacs",
+  "--batch",
+  "-f",
+  "package-initialize",
+  "-l",
+  "Main.eln",
+]
+install = """
+# Install Emacs
+sudo apt update
+sudo apt install -y autoconf build-essential gcc-14 libgccjit-14-dev libgnutls28-dev libtinfo-dev pkg-config texinfo wget zlib1g-dev
+sudo unlink /usr/bin/gcc
+sudo ln -s /usr/bin/gcc-14 /usr/bin/gcc
+# sudo ln -s /usr/lib/x86_64-linux-gnu/libgccjit.so.0.0.1 /usr/lib/x86_64-linux-gnu/libgccjit.so
+cd /tmp
+wget https://ftp.gnu.org/gnu/emacs/emacs-29.4.tar.gz
+tar xvf emacs-29.4.tar.gz
+cd emacs-29.4
+./configure --with-native-compilation
+make bootstrap NATIVE_FULL_AOT=1
+sudo make install
+# Install libraries
+emacs --batch --eval \"\\
+(progn
+  (package-initialize)
+  (add-to-list 'package-archives '(\\\"melpa\\\" . \\\"https://melpa.org/packages/\\\") t)
+  (package-refresh-contents)
+  (mapc #'package-install
+        '(dash
+          ht
+          recur
+          s)))\"
+emacs --batch --eval \"(package-initialize)\" -f batch-byte-compile ~/.emacs.d/elpa/**/*.el
+emacs --batch --eval \"(package-initialize)\" -f batch-native-compile ~/.emacs.d/elpa/**/*.el
+# 1MB以上のパッケージを消してみる.
+sudo apt purge -y autoconf libgnutls28-dev texinfo
+sudo apt autopurge -y
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://git.savannah.gnu.org/cgit/emacs.git/tree/COPYING"
+
+[library.dash]
+version = "2.19.1"
+
+[[library.dash.license]]
+name = "GPL-3.0-or-later"
+url = "https://github.com/magnars/dash.el/blob/master/LICENSE"
+
+[library.s]
+version = "1.13.0 Stable"
+
+[[library.s.license]]
+name = "GPL-3.0-or-later"
+url = "https://github.com/magnars/s.el/blob/master/LICENSE"
+
+[library.recur]
+version = "v0.1.0"
+
+[[library.recur.license]]
+name = "GPL-3.0-or-later"
+url = "https://github.com/ROCKTAKEY/recur/blob/master/LICENSE"
+
+[library.ht]
+version = "2.4"
+
+[[library.ht.license]]
+name = "GPL-3.0-or-later"
+url = "https://github.com/Wilfred/ht.el/blob/master/ht.el#L10-L21"

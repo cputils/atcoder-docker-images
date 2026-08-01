@@ -1,0 +1,75 @@
+language = "Eiffel"
+display = "Eiffel (Gobo Eiffel 22.01)"
+filename = "main.e"
+object = "Main"
+compile = """
+export GOBO=$HOME/gobo
+export PATH=$GOBO/bin:$PATH
+gec --gc=boehm main.ecf 1>&2
+"""
+execution = ["./Main"]
+install = """
+sudo apt-get update
+sudo apt-get install -y libgc-dev
+
+pushd $HOME
+wget -q -O /tmp/gobo.tar.gz https://github.com/gobo-eiffel/gobo/releases/download/gobo-22.01/gobo2201-src.tar.gz
+tar xf /tmp/gobo.tar.gz
+pushd gobo/bin
+export GOBO=$HOME/gobo
+./install.sh --thread=$(nproc) gcc
+popd
+echo 'cflags: -O2 -march=native' >> gobo/tool/gec/config/c/gcc.cfg
+popd
+
+cat << 'EOF' > main.ecf
+<system name=\"Main\">
+  <target name=\"main\">
+    <root class=\"MAIN\" feature=\"make\"/>
+    <library name=\"free_elks\" location=\"${GOBO}/library/free_elks/library_ge.ecf\" readonly=\"true\"/>
+    <!-- library name=\"thread\" location=\"${GOBO}/library/thread/library_ge.ecf\" readonly=\"true\"/ -->
+    <library name=\"argument\" location=\"${GOBO}/library/argument/library.ecf\" readonly=\"true\"/>
+    <library name=\"kernel\" location=\"${GOBO}/library/kernel/library.ecf\" readonly=\"true\"/>
+    <library name=\"lexical\" location=\"${GOBO}/library/lexical/library.ecf\" readonly=\"true\"/>
+    <library name=\"math\" location=\"${GOBO}/library/math/library.ecf\" readonly=\"true\"/>
+    <library name=\"parse\" location=\"${GOBO}/library/parse/library.ecf\" readonly=\"true\"/>
+    <library name=\"pattern\" location=\"${GOBO}/library/pattern/library.ecf\" readonly=\"true\"/>
+    <library name=\"regexp\" location=\"${GOBO}/library/regexp/library.ecf\" readonly=\"true\"/>
+    <library name=\"string\" location=\"${GOBO}/library/string/library.ecf\" readonly=\"true\"/>
+    <library name=\"structure\" location=\"${GOBO}/library/structure/library.ecf\" readonly=\"true\"/>
+    <library name=\"test\" location=\"${GOBO}/library/test/library.ecf\" readonly=\"true\"/>
+    <library name=\"time\" location=\"${GOBO}/library/time/library.ecf\" readonly=\"true\"/>
+    <library name=\"tools\" location=\"${GOBO}/library/tools/library.ecf\" readonly=\"true\"/>
+    <library name=\"utility\" location=\"${GOBO}/library/utility/library.ecf\" readonly=\"true\"/>
+    <library name=\"xml\" location=\"${GOBO}/library/xml/library.ecf\" readonly=\"true\"/>
+    <library name=\"xpath\" location=\"${GOBO}/library/xpath/library.ecf\" readonly=\"true\"/>
+    <library name=\"xslt\" location=\"${GOBO}/library/xslt/library.ecf\" readonly=\"true\"/>
+    <cluster name=\"root_cluster\" location=\"./\" recursive=\"false\">
+    </cluster>
+  </target>
+</system>
+EOF
+cat << 'EOF' > main.e
+class
+  MAIN
+
+create
+  make
+
+feature
+  make
+    do
+      print (\"Hello, world!%N\")
+    end
+end
+EOF
+
+export PATH=$GOBO/bin:$PATH
+gec --gc=boehm main.ecf
+./Main
+rm Main*
+"""
+
+[[license]]
+name = "MIT"
+url = "http://www.gobosoft.com/eiffel/gobo/license.html"

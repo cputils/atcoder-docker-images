@@ -1,0 +1,135 @@
+language = "Common Lisp"
+display = "Common Lisp (SBCL 2.5.8)"
+filename = "Main.lisp"
+object = "Main.fasl"
+compile = """
+export SBCL_HOME=/usr/local/lib/sbcl
+./sbcl --eval '(compile-file \"Main.lisp\")' --quit
+if [ -f Main.fasl ]; then
+  chmod +x Main.fasl
+fi
+"""
+execution = ["./Main.fasl"]
+install = """
+sudo apt-get update
+pushd /tmp
+# sbcl is required to compile sbcl
+sudo apt install -y sbcl
+AC_SBCL_VERSION=2.5.8
+wget -q --trust-server-names https://sourceforge.net/projects/sbcl/files/sbcl/$AC_SBCL_VERSION/sbcl-$AC_SBCL_VERSION-source.tar.bz2/download -O sbcl-$AC_SBCL_VERSION-source.tar.bz2
+tar xf sbcl-$AC_SBCL_VERSION-source.tar.bz2
+cd sbcl-$AC_SBCL_VERSION
+GNUMAKE=make sh make.sh
+sudo sh install.sh
+# remove sbcl installed via apt
+sudo apt --purge -y remove sbcl
+
+# Install Libraries
+sudo apt-get install -y libgsl-dev libffi-dev
+cd /tmp
+curl -O https://beta.quicklisp.org/quicklisp.lisp
+echo '(quicklisp-quickstart:install)' | sbcl --load quicklisp.lisp
+cat > dump.lisp << 'EOF'
+(require :sb-gmp)
+(require :sb-mpfr)
+(require :sb-queue)
+(require :sb-rotate-byte)
+(require :sb-simd)
+(progn
+  (let ((quicklisp-init (merge-pathnames \"quicklisp/setup.lisp\"
+                                            (user-homedir-pathname))))
+    (when (probe-file quicklisp-init)
+      (load quicklisp-init)))
+
+(sb-ext:save-lisp-and-die \"sbcl\" :executable t :save-runtime-options t))
+EOF
+sbcl --noinform --control-stack-size 512 --script dump.lisp
+
+popd
+cp -p /tmp/sbcl .
+export SBCL_HOME=/usr/local/lib/sbcl
+./sbcl --eval '(ql:quickload \"fast-generic-functions\")' --quit
+./sbcl --eval '(ql:quickload \"cl-ppcre\")' --quit
+./sbcl --eval '(ql:quickload \"gsll\")' --quit
+./sbcl --eval '(ql:quickload \"iterate\")' --quit
+./sbcl --eval '(ql:quickload \"pileup\")' --quit
+./sbcl --eval '(ql:quickload \"queues\")' --quit
+./sbcl --eval '(ql:quickload \"str\")' --quit
+./sbcl --eval '(ql:quickload \"trees\")' --quit
+./sbcl --eval '(ql:quickload \"trivia\")' --quit
+
+# Run the code at the Custom Test to show installed packages
+#(defun list-installed-quicklisp-packages ()
+#  (loop for system in (ql-dist:installed-systems t)
+#        for name = (ql-dist::name system)
+#        for version = (or (asdf:component-version (asdf:find-system name)) \"N/A\")
+#        collect (list name version)))
+#
+#(dolist (package (list-installed-quicklisp-packages))
+#  (format t \"~a ~a~%\" (first package) (second package)))
+"""
+
+[environment]
+SBCL_HOME = "/usr/local/lib/sbcl"
+
+[[license]]
+name = "!License-12"
+url = "https://github.com/sbcl/sbcl/blob/master/COPYING"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/quicklisp/quicklisp-client/blob/master/LICENSE.txt"
+
+[library.fast-generic-functions]
+
+[[library.fast-generic-functions.license]]
+name = "MIT"
+url = "https://github.com/marcoheisig/fast-generic-functions/blob/master/LICENSE"
+
+[library.cl-ppcre]
+
+[[library.cl-ppcre.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/edicl/cl-ppcre/blob/master/LICENSE"
+
+[library.gsll]
+
+[[library.gsll.license]]
+name = "GPL-3.0-only"
+url = "https://gitlab.common-lisp.net/antik/gsll/-/blob/master/LICENSE?ref_type=heads"
+
+[library.iterate]
+
+[[library.iterate.license]]
+name = "MIT"
+url = "https://common-lisp-libraries.readthedocs.io/iterate/"
+
+[library.pileup]
+
+[[library.pileup.license]]
+name = "MIT"
+url = "https://github.com/nikodemus/pileup/blob/master/LICENCE"
+
+[library.queues]
+
+[[library.queues.license]]
+name = "MIT"
+url = "https://github.com/oconnore/queues/blob/master/LICENSE"
+
+[library.str]
+
+[[library.str.license]]
+name = "MIT"
+url = "https://github.com/vindarel/cl-str/blob/master/LICENSE"
+
+[library.trees]
+
+[[library.trees.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/froydnj/trees/blob/master/LICENSE"
+
+[library.trivia]
+
+[[library.trivia.license]]
+name = "!License-11"
+url = "https://github.com/guicho271828/trivia/blob/master/LICENSE"

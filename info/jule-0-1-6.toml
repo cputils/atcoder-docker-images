@@ -1,0 +1,351 @@
+language = "Jule"
+display = "Jule (jule 0.1.6)"
+filename = "Main.jule"
+object = "a.out"
+compile = """
+$HOME/jule/bin/julec --cppstd cpp20 --opt L2 -p . | ansifilter 1>&2
+"""
+execution = ["./a.out"]
+install = """
+AC2025_GCC_VERSION=15.2.0
+AC2025_GCC_MAJOR_VERSION=$(echo \"$AC2025_GCC_VERSION\" | cut -d'.' -f1)
+AC2025_LLVM_VERSION=21.1.0
+
+sudo apt-get update
+sudo apt-get install --no-install-recommends -y software-properties-common
+sudo add-apt-repository -y ppa:puni070/gcc-noble
+sudo apt-get install -y ansifilter cmake libgmp-dev libeigen3-dev zlib1g-dev libgtest-dev git libbenchmark-dev libgmock-dev binutils-dev libmpfr-dev libmpc-dev libisl-dev libzstd-dev zlib1g-dev libbz2-dev libtbb12 libopenblas0 liblapack3 libmetis5 patchelf
+
+sudo apt-get --purge remove -y cpp
+sudo apt-get install -y g++-${AC2025_GCC_MAJOR_VERSION}
+
+# Internal functions to install the latest releases from github
+gh_latest_version() {
+  local owner
+  owner=\"$1\"
+  local repo
+  repo=\"$2\"
+  local info
+  info=\"$(curl -s https://api.github.com/repos/\"$owner\"/\"$repo\"/releases/latest)\"
+  local version
+  version=\"$(echo \"$info\" | sed -n '/tag_name/ { s/.*: \"v\\?\\(.*\\)\".*/\\1/;p }')\"
+  echo \"$version\"
+}
+
+gh_download_latest() {
+  local owner
+  owner=\"$1\"
+  local repo
+  repo=\"$2\"
+  local pattern
+  pattern=\"$3\"
+  local ext
+  ext=\"$4\"
+  local exclude
+  exclude=\"$5\"
+  local exclude_pattern
+  if [ -n \"$exclude\" ]; then
+    exclude_pattern=\"/$exclude/!\"
+  fi
+  local info
+  info=\"$(curl -s https://api.github.com/repos/\"$owner\"/\"$repo\"/releases)\"
+  local version
+  version=\"$(echo \"$info\" | sed -n \"/tag_name/ { $exclude_pattern { s/.*: \\\"\\(.*\\)\\\".*/\\1/;p;q } }\")\"
+  local url
+  if [ -z \"$pattern\" ]; then
+    url=\"$(echo \"$info\" | sed -n \"/tarball_url/ { $exclude_pattern { s/.*: \\\"\\(.*\\)\\\".*/\\1/;p;q } }\")\"
+  else
+    url=\"$(echo \"$info\" | sed -n \"/browser_download_url.*$pattern.*$ext\\\"/ { $exclude_pattern { s/.*: \\\"\\(.*$pattern.*$ext\\)\\\".*/\\1/;p;q } }\")\"
+  fi
+  local dirname
+  dirname=\"$owner\"-\"$repo\"
+  wget -nv -O \"$dirname\"-tarball \"$url\"
+  mkdir \"$dirname\"
+  #tar -C \"$dirname\" --strip-components=1 -xf \"$dirname\"-tarball
+  tar -C \"$dirname\" -xf \"$dirname\"-tarball
+  echo \"$owner/$repo $version\" >> $HOME/library_version
+  echo \"$version\"
+}
+
+do_update_alternatives() {
+  local link=$1
+  local packages=$2
+  local version=$3
+  local slaves=\"\"
+  local bins=$(dpkg -L $packages|grep -E \"^/usr/bin/.*-$version$\")
+  local bin
+  for bin in $bins
+  do
+    local name=$(basename \"$bin\"|sed \"s/-$version$//\")
+    if [ \"$name\" != \"$link\" ]; then
+      slaves+=\"--slave /usr/bin/$name $name /usr/bin/$name-$version \"
+    fi
+  done
+  sudo update-alternatives --quiet --install /usr/bin/$link $link /usr/bin/$link-$version 100 $slaves
+}
+
+do_update_alternatives \"gcc\" \"$(apt-cache depends --recurse --installed g++-${AC2025_GCC_MAJOR_VERSION} | grep -E \"^[A-z].*-${AC2025_GCC_MAJOR_VERSION}.*\" | sort -u)\" ${AC2025_GCC_MAJOR_VERSION}
+
+pushd /tmp
+
+# Install jule
+wget -nv https://github.com/julelang/jule/releases/download/jule0.1.6/jule-linux-amd64.zip
+unzip -q jule-linux-amd64.zip -x '__MACOSX/*' -d $HOME
+
+# Install clang
+# gh_download_latest \"llvm\" \"llvm-project\"
+wget -nv -O llvm.tar.gz https://api.github.com/repos/llvm/llvm-project/tarball/llvmorg-${AC2025_LLVM_VERSION}
+mkdir llvm-llvm-project
+tar -C llvm-llvm-project -xf llvm.tar.gz
+pushd llvm-llvm-project/*
+cmake -S llvm -B build -DLLVM_ENABLE_PROJECTS=\"clang;lld;polly\" -DCMAKE_BUILD_TYPE=Release -DLLVM_PARALLEL_COMPILE_JOBS=$(nproc) -DLLVM_PARALLEL_LINK_JOBS=1 -DLLVM_PARALLEL_TABLEGEN_JOBS=$(nproc) -DLLVM_ENABLE_RUNTIMES=\"libc;libunwind;libcxxabi;libcxx;compiler-rt;openmp\" -DLLVM_TARGETS_TO_BUILD=host -DLLVM_BINUTILS_INCDIR=/usr/include
+cmake --build build -j$(nproc)
+sudo cmake --build build --target install
+echo \"/usr/local/lib/x86_64-unknown-linux-gnu\" | sudo tee /etc/ld.so.conf.d/x86_64-unknown-linux-gnu.conf
+popd
+sudo ldconfig
+
+# Install libraries
+
+# gh_download_latest \"abseil\" \"abseil-cpp\"
+# pushd abseil-abseil-cpp/*
+#
+# google-or-tools 9.14 requires abseil-cpp-20250512.1 as a dependency
+#
+wget -nv -O abseil.tar.gz https://github.com/abseil/abseil-cpp/releases/download/20250512.1/abseil-cpp-20250512.1.tar.gz
+mkdir abseil-cpp
+tar -C abseil-cpp -xf abseil.tar.gz
+pushd abseil-cpp/abseil*
+
+cmake -DABSL_BUILD_TESTING=ON -DABSL_USE_GOOGLETEST_HEAD=ON -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_FLAGS:STRING=\"-O2 -fPIC\" -B build
+cmake --build build --config Release --target all -j $(nproc)
+cd build
+ctest -j$(nproc) --repeat until-pass:5 || ctest --rerun-failed
+cd ..
+sudo cmake --build build --target install -j $(nproc)
+sudo ldconfig
+popd
+
+# gh_download_latest \"atcoder\" \"ac-library\"
+wget -nv -O ac-library.tar.gz https://github.com/atcoder/ac-library/archive/refs/tags/v1.6.tar.gz
+mkdir atcoder-ac-library
+tar -C atcoder-ac-library -xf ac-library.tar.gz
+sudo cp -a --no-preserve=ownership atcoder-ac-library/*/atcoder /usr/local/include
+
+gh_download_latest \"boostorg\" \"boost\" \"b2-nodocs\" \"xz\" \"beta\"
+pushd boostorg-boost/*
+./bootstrap.sh --with-toolset=gcc --without-libraries=mpi,graph_parallel
+./b2 -j$(nproc) toolset=gcc variant=release cxxflags=\"-std=c++20\" stage
+sudo ./b2 -j$(nproc) toolset=gcc variant=release cxxflags=\"-std=c++20\" install
+popd
+
+gh_download_latest \"arximboldi\" \"immer\"
+pushd arximboldi-immer/*
+cmake -B build -Dimmer_BUILD_TESTS:BOOL=OFF -Dimmer_BUILD_DOCS:BOOL=OFF -Dimmer_BUILD_EXAMPLES:BOOL=OFF
+cmake --build build --config Release --target all
+sudo cmake --build build --target install
+popd
+
+AC_LIBTORCH_VERSION=\"$(gh_latest_version \"pytorch\" \"pytorch\")\"
+wget -nv -O libtorch.zip https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-\"$AC_LIBTORCH_VERSION\"%2Bcpu.zip
+unzip -q libtorch.zip
+pushd libtorch
+sudo cp -a --no-preserve=ownership include /usr/local/include/libtorch
+sudo cp -a --no-preserve=ownership lib /usr/local/lib/libtorch
+echo /usr/local/lib/libtorch | sudo tee /etc/ld.so.conf.d/libtorch.conf
+echo \"libtorch $AC_LIBTORCH_VERSION\" >> $HOME/library_version
+popd
+
+wget -nv https://github.com/ei1333/library/archive/refs/heads/master.tar.gz
+mkdir ei1333-library
+tar -C ei1333-library --strip-components=1 -xf master.tar.gz
+pushd ei1333-library
+rm -fr .competitive-verifier .github docs test LICENSE README.md
+sudo mkdir /usr/local/include/ei1333
+sudo cp -a --no-preserve=ownership . /usr/local/include/ei1333
+AC_EI1333_VERSION=\"$(curl -s https://api.github.com/repos/ei1333/library/branches/master | grep -m 1 sha |cut -d'\"' -f4)\"
+echo \"ei1333-library $AC_EI1333_VERSION\" >> $HOME/library_version
+popd
+
+gh_download_latest \"martinus\" \"unordered_dense\"
+pushd martinus-unordered_dense/*
+cmake -B build
+sudo cmake --build build --target install
+popd
+
+gh_download_latest \"lightgbm-org\" \"LightGBM\" \"complete_source_code\" \"tar.gz\"
+pushd lightgbm-org-LightGBM
+cmake -B build -S .
+cmake --build build -j$(nproc)
+sudo cmake --build build -j$(nproc) --target install
+popd
+
+wget -nv -O scip.sh https://scipopt.org/download/release/SCIPOptSuite-9.2.3-Linux-ubuntu24.sh
+chmod +x scip.sh
+./scip.sh --skip-license --include-subdir --prefix=scip
+sudo cp -a --no-preserve=ownership scip/*/* /usr/local
+
+gh_download_latest \"ERGO-Code\" \"HiGHS\"
+pushd ERGO-Code-HiGHS/*
+cmake -S. -B build
+cmake --build build -j $(nproc)
+sudo cmake --install build
+popd
+
+gh_download_latest \"google\" \"or-tools\"
+pushd google-or-tools/*
+find . -type f -exec sed -i 's/SCIP::libscip/libscip/g' {} +
+cmake -B build -DBUILD_Protobuf:BOOL=ON -DBUILD_re2:BOOL=ON -DBUILD_CoinUtils:BOOL=ON -DBUILD_Osi:BOOL=ON -DBUILD_Clp:BOOL=ON -DBUILD_Cgl:BOOL=ON -DBUILD_Cbc:BOOL=ON -DUSE_HIGHS:BOOL=ON -DBUILD_SAMPLES:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_STANDARD=20
+cmake --build build --config Release --target all -j 1
+sudo cmake --build build --config Release --target install -j $(nproc)
+popd
+
+gh_download_latest \"Z3Prover\" \"z3\"
+pushd Z3Prover-z3/*
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j $(nproc)
+sudo cmake --build build --target install
+popd
+
+sudo ldconfig
+
+# test compile/execute
+cat << 'EOF' > Main.jule
+#pass \"-O3\"
+#pass \"-march=native\"
+use integ \"std/jule/integrated\"
+cpp use \"<atcoder/dsu>\"
+
+#typedef
+#namespace \"atcoder\"
+cpp struct dsu {
+  merge: fn(int, int)
+  size: fn(int): int
+}
+
+fn NewDsu(v: integ::Int): cpp.dsu {
+    ret unsafe { integ::Emit[cpp.dsu](\"atcoder::dsu({})\", v) }
+}
+
+fn main() {
+  let d = NewDsu(40)
+  d.merge(0, 1)
+  println(d.size(0))
+  println(d.size(2))
+}
+EOF
+$HOME/jule/bin/julec --cppstd cpp20 --opt L2 -p . | ansifilter 1>&2
+./a.out
+rm a.out
+"""
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/julelang/jule/blob/master/LICENSE"
+
+[library.abseil]
+
+[[library.abseil.license]]
+name = "Apache-2.0"
+url = "https://github.com/abseil/abseil-cpp/blob/master/LICENSE"
+
+[library.ac-library]
+version = "1.6"
+
+[[library.ac-library.license]]
+name = "CC0-1.0"
+url = "https://github.com/atcoder/ac-library/blob/master/LICENSE"
+
+[library.boost]
+
+[[library.boost.license]]
+name = "BSL-1.0"
+url = "https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt"
+
+[library.immer]
+
+[[library.immer.license]]
+name = "BSL-1.0"
+url = "https://github.com/arximboldi/immer/blob/master/LICENSE"
+
+[library.ei1333-library]
+
+[[library.ei1333-library.license]]
+name = "Unlicense"
+url = "https://github.com/ei1333/library/blob/master/LICENSE"
+
+[library.eigen]
+
+[[library.eigen.license]]
+name = "MPL-2.0"
+url = "https://eigen.tuxfamily.org/index.php?title=Main_Page#License"
+
+[library.gmp]
+
+[[library.gmp.license]]
+name = "LGPL-3.0-only"
+url = "https://gmplib.org/#WHAT"
+
+[[library.gmp.license]]
+name = "GPL-2.0-only"
+url = "https://gmplib.org/#WHAT"
+
+[library.libtorch]
+
+[[library.libtorch.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/pytorch/pytorch/blob/main/LICENSE"
+
+[[library.libtorch.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[[library.libtorch.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[[library.libtorch.license]]
+name = "BSL-1.0"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[[library.libtorch.license]]
+name = "MIT-CMU"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[library.unordered_dense]
+
+[[library.unordered_dense.license]]
+name = "MIT"
+url = "https://github.com/martinus/unordered_dense/blob/main/LICENSE"
+
+[library.lightgbm]
+
+[[library.lightgbm.license]]
+name = "MIT"
+url = "https://github.com/lightgbm-org/LightGBM/blob/master/LICENSE"
+
+[library.highs]
+indirect = true
+
+[[library.highs.license]]
+name = "MIT"
+url = "https://github.com/ERGO-Code/HiGHS/blob/master/LICENSE.txt"
+
+[library.scip]
+indirect = true
+
+[[library.scip.license]]
+name = "Apache-2.0"
+url = "https://www.scipopt.org/scip/doc/html/LICENSE.php"
+
+[library.or-tools]
+
+[[library.or-tools.license]]
+name = "Apache-2.0"
+url = "https://github.com/google/or-tools/blob/stable/LICENSE"
+
+[library.z3]
+
+[[library.z3.license]]
+name = "MIT"
+url = "https://github.com/Z3Prover/z3/blob/master/LICENSE.txt"

@@ -1,0 +1,18 @@
+language = "Prolog"
+display = "Prolog (SWI-Prolog 9.2.9)"
+filename = "Main.pl"
+object = "a.out"
+compile = """
+swipl -O -g main -o a.out -c Main.pl
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get install -y software-properties-common
+sudo apt-add-repository -y ppa:swi-prolog/stable
+sudo apt-get update
+sudo apt-get install -y swi-prolog
+"""
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://www.swi-prolog.org/license.html"

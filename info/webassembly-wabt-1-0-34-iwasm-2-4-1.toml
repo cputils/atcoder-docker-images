@@ -1,0 +1,47 @@
+language = "WebAssembly"
+display = "WebAssembly (wabt 1.0.34 + iwasm 2.4.1)"
+filename = "Main.wat"
+object = "Main.aot"
+compile = """
+wat2wasm Main.wat && wamrc -o Main.aot Main.wasm
+"""
+execution = [
+  "iwasm",
+  "Main.aot",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y cmake g++-multilib libgcc-13-dev lib32gcc-13-dev ccache wabt llvm git
+#
+# uncomment below if you use wasm-tools
+#
+# sudo apt-get install -y cmake g++-multilib libgcc-13-dev lib32gcc-13-dev ccache cargo
+# curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+# cargo binstall -y wasm-tools
+
+pushd /tmp
+wget -q -O wamr.tar.gz https://github.com/bytecodealliance/wasm-micro-runtime/archive/refs/tags/WAMR-2.4.1.tar.gz
+mkdir wamr
+tar -C wamr --strip-components=1 -xf wamr.tar.gz
+cd wamr
+pushd product-mini/platforms/linux
+cmake -B build
+cmake --build build -j$(nproc)
+sudo cmake --install build
+popd
+pushd wamr-compiler
+cmake -B build -DWAMR_BUILD_WITH_CUSTOM_LLVM=1
+cmake --build build -j$(nproc)
+sudo cmake --install build
+popd
+popd
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/WebAssembly/wabt/blob/main/LICENSE"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/bytecodealliance/wasm-micro-runtime/blob/main/LICENSE"
+exception = "LLVM-exception"

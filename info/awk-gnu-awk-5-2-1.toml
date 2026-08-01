@@ -1,0 +1,15 @@
+language = "AWK"
+display = "AWK (GNU awk 5.2.1)"
+filename = "Main.awk"
+execution = [
+  "gawk",
+  "-f",
+  "Main.awk",
+]
+install = """
+sudo apt install -y gawk=1:5.2.1-2build3
+"""
+
+[[license]]
+name = "GPL-3.0-only"
+url = "https://www.gnu.org/software/gawk/manual/gawk.html#The-GNU-Project-and-This-Book"

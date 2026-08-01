@@ -1,0 +1,32 @@
+language = "プロデル"
+display = "プロデル (mono版プロデル 2.0.1353)"
+filename = "produire-mono/Main.rdr"
+object = "produire-mono/Main.exe"
+compile = """
+mono produire-mono/rdrc.exe /console /mono /quiet produire-mono/Main.rdr
+if [ $? -ne 0 ]; then
+  rm -f produire-mono/Main.exe
+fi
+"""
+execution = [
+  "mono",
+  "produire-mono/Main.exe",
+]
+install = """
+# install mono
+sudo apt install -y ca-certificates gnupg
+sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+echo \"deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main\" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+sudo apt update
+sudo apt install -y mono-devel libgtk2.0-dev
+
+# expand produire
+PRODUIRE_SRC_FILE=\"produire-mono-2.0.1353.zip\"
+wget https://produ.irelang.jp/downloads/mono/${PRODUIRE_SRC_FILE}
+unzip -O cp932 ${PRODUIRE_SRC_FILE}
+rm ${PRODUIRE_SRC_FILE}
+"""
+
+[[license]]
+name = "!License-18"
+url = "https://produ.irelang.jp/blog/eula/"

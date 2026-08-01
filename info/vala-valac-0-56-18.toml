@@ -1,0 +1,37 @@
+language = "Vala"
+display = "Vala (valac 0.56.18)"
+filename = "Main.vala"
+object = "a.out"
+compile = """
+valac --Xcc=\"-O2\" --pkg gee-0.8 --pkg gsl -o a.out Main.vala
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get update
+sudo apt-get install -y valac libgee-0.8-dev libgsl-dev git autoconf libtool flex bison autoconf-archive gobject-introspection
+
+cd /tmp
+git clone -q https://gitlab.gnome.org/GNOME/vala.git
+cd vala
+git checkout 0.56.18
+git clean -dfx
+./autogen.sh --disable-valadoc
+make -j $(nproc) && sudo make install
+sudo apt-get --purge autoremove -y valac
+"""
+
+[[license]]
+name = "LGPL-2.1-only"
+url = "https://gitlab.gnome.org/GNOME/vala/-/blob/main/COPYING"
+
+[library.gsl]
+
+[[library.gsl.license]]
+name = "GPL-3.0-only"
+url = "https://git.savannah.gnu.org/cgit/gsl.git/plain/COPYING"
+
+[library.libgee]
+
+[[library.libgee.license]]
+name = "LGPL-2.1-only"
+url = "https://gitlab.gnome.org/GNOME/libgee/-/blob/main/COPYING"

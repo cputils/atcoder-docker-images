@@ -1,0 +1,141 @@
+language = "C#"
+display = "C# 13.0 (.NET Native AOT 9.0.8)"
+filename = "Main.cs"
+object = "publish/Main"
+compile = """
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+export DOTNET_EnableWriteXorExecute=0
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+dotnet publish -c Release -o publish --no-restore --nologo -v q --tl:off 1>&2
+"""
+execution = ["./publish/Main"]
+install = """
+# Install .NET SDK
+sudo apt-get update
+sudo apt-get install -y ca-certificates clang libc6 libgcc-s1 libgssapi-krb5-2 libicu74 liblttng-ust1 libssl3 libstdc++6 libunwind8 zlib1g zlib1g-dev
+wget -O - https://dot.net/v1/dotnet-install.sh | bash -s -- --version 9.0.304
+
+# Set environment variables
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+export DOTNET_EnableWriteXorExecute=0
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+# Create a project file in the current directory
+cat > Main.csproj << EOS
+<Project Sdk=\"Microsoft.NET.Sdk\">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>ONLINE_JUDGE;ATCODER</DefineConstants>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcInstructionSet>native</IlcInstructionSet>
+    <IlcMaxVectorTBitWidth>512</IlcMaxVectorTBitWidth>
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <WarningsAsErrors>IL2104;IL3053</WarningsAsErrors>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include=\"ac-library-csharp\" Version=\"3.9.2-atcoder1\" />
+    <PackageReference Include=\"MathNet.Numerics\" Version=\"5.0.0\" />
+  </ItemGroup>
+</Project>
+EOS
+
+# Create a lock file in the current directory for library reproducibility
+cat > packages.lock.json << EOS
+{
+  \"version\": 1,
+  \"dependencies\": {
+    \"net9.0\": {
+      \"ac-library-csharp\": {
+        \"type\": \"Direct\",
+        \"requested\": \"[3.9.2-atcoder1, )\",
+        \"resolved\": \"3.9.2-atcoder1\",
+        \"contentHash\": \"pDKLPopUWCSxZsqKjHNhuzC7xzJSfSRpyJoYb310izympE3J66QWf54JikiWEzDR4tBzL2tKf0r9fdBWKcovoQ==\"
+      },
+      \"MathNet.Numerics\": {
+        \"type\": \"Direct\",
+        \"requested\": \"[5.0.0, )\",
+        \"resolved\": \"5.0.0\",
+        \"contentHash\": \"pg1W2VwaEQMAiTpGK840hZgzavnqjlCMTVSbtVCXVyT+7AX4mc1o89SPv4TBlAjhgCOo9c1Y+jZ5m3ti2YgGgA==\"
+      },
+      \"Microsoft.DotNet.ILCompiler\": {
+        \"type\": \"Direct\",
+        \"requested\": \"[9.0.8, )\",
+        \"resolved\": \"9.0.8\",
+        \"contentHash\": \"cMwVh5hsxAhv+oMHQdgcXodt2kDpfviofBO4IXupSAHJW2vZOZOOIhvPWRGO6NeGcP8SR4OpSwktRqb0i79KFA==\"
+      },
+      \"Microsoft.NET.ILLink.Tasks\": {
+        \"type\": \"Direct\",
+        \"requested\": \"[9.0.8, )\",
+        \"resolved\": \"9.0.8\",
+        \"contentHash\": \"rd1CbIsMtVPtZNTIVD6Xydue//klYOOQIDpRgu3BHtv17AlpRs74/6QFbcYgMm/jL+naVU2T3OFLxVSLV5lQLQ==\"
+      }
+    },
+    \"net9.0/linux-x64\": {
+      \"Microsoft.DotNet.ILCompiler\": {
+        \"type\": \"Direct\",
+        \"requested\": \"[9.0.8, )\",
+        \"resolved\": \"9.0.8\",
+        \"contentHash\": \"cMwVh5hsxAhv+oMHQdgcXodt2kDpfviofBO4IXupSAHJW2vZOZOOIhvPWRGO6NeGcP8SR4OpSwktRqb0i79KFA==\",
+        \"dependencies\": {
+          \"runtime.linux-x64.Microsoft.DotNet.ILCompiler\": \"9.0.8\"
+        }
+      },
+      \"runtime.linux-x64.Microsoft.DotNet.ILCompiler\": {
+        \"type\": \"Transitive\",
+        \"resolved\": \"9.0.8\",
+        \"contentHash\": \"odpM8kiUn/QLIGzsPIMTgPb+Q99rKGtaDQe6yHE9/KtawL3XtIWejjg5NWktIlZ/jlSIvIUDI5NWI+rg4aQcNw==\"
+      }
+    }
+  }
+}
+EOS
+
+# Restore and pre-compile the project
+echo 'Console.WriteLine(\"Hello, world!\");' > Main.cs
+dotnet publish -c Release -o publish -v n
+rm publish/Main
+rm Main.cs
+"""
+
+[environment]
+DOTNET_ROOT = "/home/runner/.dotnet"
+PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.dotnet:/home/runner/.dotnet/tools"
+DOTNET_EnableWriteXorExecute = "0"
+DOTNET_CLI_TELEMETRY_OPTOUT = "1"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/dotnet/sdk/blob/main/LICENSE.TXT"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/dotnet/runtime/blob/main/LICENSE.TXT"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/dotnet/roslyn/blob/main/License.txt"
+
+[library.ac-library-csharp]
+version = "3.9.2-atcoder1"
+
+[[library.ac-library-csharp.license]]
+name = "CC0-1.0"
+url = "https://github.com/kzrnm/ac-library-csharp/blob/main/Source/ac-library-csharp/LICENSE"
+
+[library."MathNet.Numerics"]
+version = "5.0.0"
+
+[[library."MathNet.Numerics".license]]
+name = "MIT"
+url = "https://github.com/mathnet/mathnet-numerics/blob/master/LICENSE.md"

@@ -1,0 +1,31 @@
+language = "APL"
+display = "APL (GNU APL 1.9)"
+filename = "Main.apl"
+execution = [
+  "apl",
+  "--silent",
+  "--noCIN",
+  "--noCONT",
+  "--noColor",
+  "--OFF",
+  "--noSV",
+  "--rawCIN",
+  "-f",
+  "Main.apl",
+]
+install = """
+sudo apt update
+cd /tmp
+wget https://ftpmirror.gnu.org/gnu/apl/apl-1.9.tar.gz
+tar xzf apl-1.9.tar.gz
+cd apl-1.9
+sudo apt install -y g++ subversion make
+sudo apt install -y libfftw3-dev
+./configure
+make
+sudo make install
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://www.gnu.org/software/apl/apl.html#Section-7_002e2"

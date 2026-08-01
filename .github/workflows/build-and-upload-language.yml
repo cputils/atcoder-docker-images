@@ -1,0 +1,33 @@
+name: Build and upload language image
+
+on:
+  workflow_dispatch:
+    inputs:
+      selector:
+        description: Language selector/stem/display to build
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v8.0.0
+
+      - name: Build image
+        run: uv run build.py "${{ inputs.selector }}"
+
+      - name: Upload to GHCR
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run upload.py "${{ inputs.selector }}"

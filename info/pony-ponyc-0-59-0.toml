@@ -1,0 +1,81 @@
+language = "Pony"
+display = "Pony (ponyc 0.59.0)"
+filename = "Main.pony"
+object = "a.out"
+compile = """
+export PATH=/usr/local/bin:$PATH
+if ! corral run -- ponyc -b a.out -V=0 > err-out; then
+  tail -n +4 err-out 1>&2
+fi
+"""
+execution = ["./a.out"]
+install = """
+# SHELL variable must be set for the judge system
+export SHELL=bash
+set -euxo pipefail
+
+sudo apt-get update
+sudo apt-get install -y clang cmake git
+
+PONYC_VERSION=\"0.59.0\"
+PONYC_REPO=\"https://github.com/ponylang/ponyc\"
+CORRAL_VERSION=\"0.9.2\"
+CORRAL_REPO=\"https://github.com/ponylang/corral\"
+
+build_root=\"$(mktemp -d)\"
+cleanup() {
+  rm -rf \"$build_root\"
+}
+trap cleanup EXIT
+
+git clone --depth 1 --branch \"$PONYC_VERSION\" --recurse-submodules \"$PONYC_REPO\" \"$build_root/ponyc\"
+pushd \"$build_root/ponyc\"
+make libs build_flags=\"-j2\"
+make configure arch=x86-64 tune=generic
+make build build_flags=\"-j2\"
+sudo make install
+popd
+
+git clone --depth 1 --branch \"$CORRAL_VERSION\" \"$CORRAL_REPO\" \"$build_root/corral\"
+pushd \"$build_root/corral\"
+make PONYC=/usr/local/bin/ponyc
+sudo make install
+popd
+
+export PATH=/usr/local/bin:$PATH
+
+# create project and install libraries
+corral init
+gh_latest_version() {
+  local owner
+  owner=\"$1\"
+  local repo
+  repo=\"$2\"
+  local info
+  info=\"$(curl -s https://api.github.com/repos/\"$owner\"/\"$repo\"/releases/latest)\"
+  local version
+  version=\"$(echo \"$info\" | sed -n '/tag_name/ { s/.*: \"v\\?\\(.*\\)\".*/\\1/;p }')\"
+  echo \"$version\"
+}
+AC_REGEX_VERSION=\"$(gh_latest_version \"ponylang\" \"regex\")\"
+corral add --version=\"$AC_REGEX_VERSION\" github.com/ponylang/regex.git
+AC_VALBYTES_VERSION=\"$(gh_latest_version \"ponylang\" \"valbytes\")\"
+corral add --version=\"$AC_VALBYTES_VERSION\" github.com/ponylang/valbytes.git
+corral update
+"""
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://github.com/ponylang/ponyc/blob/main/LICENSE"
+
+[library.regex]
+
+[[library.regex.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/ponylang/regex/blob/main/LICENSE"
+
+[library.valbytes]
+
+[[library.valbytes.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/ponylang/valbytes/blob/main/LICENSE"

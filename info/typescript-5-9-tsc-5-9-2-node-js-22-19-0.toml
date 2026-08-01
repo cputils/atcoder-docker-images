@@ -1,0 +1,223 @@
+language = "TypeScript"
+display = "TypeScript 5.9 (tsc 5.9.2 (Node.js 22.19.0))"
+filename = "Main.ts"
+object = "Main.js"
+compile = """
+tsc Main.ts --target ESNext --moduleResolution nodenext --module NodeNext --noEmitOnError --pretty true | ansifilter 1>&2
+"""
+execution = [
+  "sh",
+  "node.sh",
+  "{memory:kb}",
+  "Main.js",
+  "ONLINE_JUDGE",
+  "ATCODER",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y ansifilter
+
+NODE_VERSION=22.19.0
+wget -q -O /tmp/node.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
+sudo tar -C /usr/local --strip-components=1 -xf /tmp/node.tar.xz --wildcards '*/bin' '*/share' '*/lib' '*/include'
+
+# tsc and Node.js cannot find libraries in /usr/local/lib/node_modules
+sudo ln -s /usr/local/lib/node_modules /node_modules
+
+# Create a script to execute with limited stack size
+cat << 'EOF' > node.sh
+#!/bin/sh
+
+if [ \"$1\" -gt 1048576 ]; then
+  stack_size=1048576
+else
+  stack_size=\"$1\"
+fi
+
+filename=\"$2\"
+
+node \\
+--stack-size=\"$stack_size\" \\
+\"$filename\" \\
+ONLINE_JUDGE \\
+ATCODER
+EOF
+
+# install libraries
+sudo npm install -g \\
+ac-library-js@0.1.1 \\
+data-structure-typed@2.0.4 \\
+immutable@5.1.3 \\
+lodash@4.17.21 \\
+mathjs@14.7.0 \\
+tstl@3.0.0 \\
+@types/lodash@4.17.20 \\
+@types/node@22.18.1 \\
+typescript@5.9.2 \\
+
+"""
+
+[[license]]
+name = "!License-31"
+url = "https://github.com/nodejs/node/blob/main/LICENSE"
+
+[library.ac-library-js]
+version = "0.1.1"
+
+[[library.ac-library-js.license]]
+name = "CC0-1.0"
+url = "https://www.npmjs.com/package/ac-library-js"
+
+[library.data-structure-typed]
+version = "2.0.4"
+
+[[library.data-structure-typed.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/data-structure-typed"
+
+[library.immutable]
+version = "5.1.3"
+
+[[library.immutable.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/immutable"
+
+[library.lodash]
+version = "4.17.21"
+
+[[library.lodash.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/lodash"
+
+[library.mathjs]
+version = "14.7.0"
+
+[[library.mathjs.license]]
+name = "Apache-2.0"
+url = "https://www.npmjs.com/package/mathjs"
+
+[library.tstl]
+version = "3.0.0"
+
+[[library.tstl.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/tstl"
+
+[library."@types/lodash"]
+version = "4.17.20"
+
+[[library."@types/lodash".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@types/lodash"
+
+[library."@types/node"]
+version = "22.18.1"
+
+[[library."@types/node".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@types/node"
+
+[library.typescript]
+version = "5.9.2"
+
+[[library.typescript.license]]
+name = "Apache-2.0"
+url = "https://www.npmjs.com/package/typescript"
+
+[library."@commander-js/extra-typings"]
+indirect = true
+
+[[library."@commander-js/extra-typings".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@commander-js/extra-typings"
+
+[library.commander]
+indirect = true
+
+[[library.commander.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/commander"
+
+[library.esbuild]
+indirect = true
+
+[[library.esbuild.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/esbuild"
+
+[library."@esbuild/linux-x64"]
+indirect = true
+
+[[library."@esbuild/linux-x64".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@esbuild/linux-x64"
+
+[library."@babel/runtime"]
+indirect = true
+
+[[library."@babel/runtime".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@babel/runtime"
+
+[library."complex.js"]
+indirect = true
+
+[[library."complex.js".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/complex.js"
+
+[library."decimal.js"]
+indirect = true
+
+[[library."decimal.js".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/decimal.js"
+
+[library.escape-latex]
+indirect = true
+
+[[library.escape-latex.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/escape-latex"
+
+[library."fraction.js"]
+indirect = true
+
+[[library."fraction.js".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/fraction.js"
+
+[library.javascript-natural-sort]
+indirect = true
+
+[[library.javascript-natural-sort.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/javascript-natural-sort"
+
+[library.seedrandom]
+indirect = true
+
+[[library.seedrandom.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/seedrandom"
+
+[library.tiny-emitter]
+indirect = true
+
+[[library.tiny-emitter.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/tiny-emitter"
+
+[library.typed-function]
+indirect = true
+
+[[library.typed-function.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/typed-function"
+
+[library.undici-types]
+indirect = true
+
+[[library.undici-types.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/undici-types"

@@ -1,0 +1,34 @@
+language = "Unison"
+display = "Unison (Unison 0.5.47)"
+filename = "main.u"
+object = "main.uc"
+compile = """
+sh -c \"echo 'load main.u'; sleep 5 ; echo 'add'\" | /opt/ucm/ucm > compile-out
+echo 'compile main main' | /opt/ucm/ucm
+if [ ! -f main ]; then
+  cat compile-out | ansifilter 1>&2
+fi
+"""
+execution = [
+  "/opt/ucm/ucm",
+  "run.compiled",
+  "main.uc",
+]
+install = """
+sudo apt update
+sudo apt install -y ansifilter
+pushd /tmp
+wget -q https://github.com/unisonweb/unison/releases/download/release/0.5.47/ucm-linux-x64.tar.gz
+sudo mkdir /opt/ucm
+sudo tar -C /opt/ucm -xf ucm-linux-x64.tar.gz
+popd
+echo project.create | /opt/ucm/ucm
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/unisonweb/unison/blob/trunk/LICENSE"
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/unisonweb/unison/blob/trunk/deps/relation"

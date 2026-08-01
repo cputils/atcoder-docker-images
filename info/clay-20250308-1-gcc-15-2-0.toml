@@ -1,0 +1,385 @@
+language = "cLay"
+display = "cLay (cLay 20250308-1 (GCC 15.2.0))"
+filename = "main.clay"
+object = "build/main"
+compile = """
+clay < main.clay > main.cpp && cmake --build build -- --quiet 1>&2
+"""
+execution = ["./build/main"]
+install = """
+AC2025_GCC_VERSION=15.2.0
+AC2025_GCC_MAJOR_VERSION=$(echo \"$AC2025_GCC_VERSION\" | cut -d'.' -f1)
+
+sudo apt-get update
+sudo apt-get install --no-install-recommends -y software-properties-common
+sudo add-apt-repository -y ppa:puni070/gcc-noble
+
+sudo apt-get install -y ansifilter cmake libgmp-dev libeigen3-dev zlib1g-dev libgtest-dev git libbenchmark-dev libgmock-dev binutils-dev libmpfr-dev libmpc-dev libisl-dev libzstd-dev zlib1g-dev ninja-build libbz2-dev libtbb12 libopenblas0 liblapack3 libmetis5 patchelf
+
+sudo apt-get --purge remove -y cpp
+sudo apt-get install -y g++-${AC2025_GCC_MAJOR_VERSION}
+
+# Internal functions to install the latest releases from github
+gh_latest_version() {
+  local owner
+  owner=\"$1\"
+  local repo
+  repo=\"$2\"
+  local info
+  info=\"$(curl -s https://api.github.com/repos/\"$owner\"/\"$repo\"/releases/latest)\"
+  local version
+  version=\"$(echo \"$info\" | sed -n '/tag_name/ { s/.*: \"v\\?\\(.*\\)\".*/\\1/;p }')\"
+  echo \"$version\"
+}
+
+gh_download_latest() {
+  local owner
+  owner=\"$1\"
+  local repo
+  repo=\"$2\"
+  local pattern
+  pattern=\"$3\"
+  local ext
+  ext=\"$4\"
+  local exclude
+  exclude=\"$5\"
+  local exclude_pattern
+  if [ -n \"$exclude\" ]; then
+    exclude_pattern=\"/$exclude/!\"
+  fi
+  local info
+  info=\"$(curl -s https://api.github.com/repos/\"$owner\"/\"$repo\"/releases)\"
+  local version
+  version=\"$(echo \"$info\" | sed -n \"/tag_name/ { $exclude_pattern { s/.*: \\\"\\(.*\\)\\\".*/\\1/;p;q } }\")\"
+  local url
+  if [ -z \"$pattern\" ]; then
+    url=\"$(echo \"$info\" | sed -n \"/tarball_url/ { $exclude_pattern { s/.*: \\\"\\(.*\\)\\\".*/\\1/;p;q } }\")\"
+  else
+    url=\"$(echo \"$info\" | sed -n \"/browser_download_url.*$pattern.*$ext\\\"/ { $exclude_pattern { s/.*: \\\"\\(.*$pattern.*$ext\\)\\\".*/\\1/;p;q } }\")\"
+  fi
+  local dirname
+  dirname=\"$owner\"-\"$repo\"
+  wget -q -O \"$dirname\"-tarball \"$url\"
+  mkdir \"$dirname\"
+  #tar -C \"$dirname\" --strip-components=1 -xf \"$dirname\"-tarball
+  tar -C \"$dirname\" -xf \"$dirname\"-tarball
+  echo \"$owner/$repo $version\" >> $HOME/library_version
+  echo \"$version\"
+}
+
+do_update_alternatives() {
+  local link=$1
+  local packages=$2
+  local version=$3
+  local slaves=\"\"
+  local bins=$(dpkg -L $packages|grep -E \"^/usr/bin/.*-$version$\")
+  local bin
+  for bin in $bins
+  do
+    local name=$(basename \"$bin\"|sed \"s/-$version$//\")
+    if [ \"$name\" != \"$link\" ]; then
+      slaves+=\"--slave /usr/bin/$name $name /usr/bin/$name-$version \"
+    fi
+  done
+  sudo update-alternatives --quiet --install /usr/bin/$link $link /usr/bin/$link-$version 100 $slaves
+}
+
+do_update_alternatives \"gcc\" \"$(apt-cache depends --recurse --installed g++-${AC2025_GCC_MAJOR_VERSION} | grep -E \"^[A-z].*-${AC2025_GCC_MAJOR_VERSION}.*\" | sort -u)\" ${AC2025_GCC_MAJOR_VERSION}
+
+pushd /tmp
+
+# Instal cLay
+wget -q https://github.com/laycrs/cLay/raw/5798ba2e652c5438269199bde5388769a49ee8db/clay.cpp
+g++ -O2 -o clay clay.cpp
+sudo install -s clay /usr/local/bin
+
+# Install libraries
+
+# gh_download_latest \"abseil\" \"abseil-cpp\"
+# pushd abseil-abseil-cpp/*
+#
+# google-or-tools 9.14 requires abseil-cpp-20250512.1 as a dependency
+#
+wget -q -O abseil.tar.gz https://github.com/abseil/abseil-cpp/releases/download/20250512.1/abseil-cpp-20250512.1.tar.gz
+mkdir abseil-cpp
+tar -C abseil-cpp -xf abseil.tar.gz
+pushd abseil-cpp/abseil*
+
+cmake -DABSL_BUILD_TESTING=OFF -DABSL_USE_GOOGLETEST_HEAD=OFF -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_FLAGS:STRING=\"-O2 -fPIC\" -B build -G Ninja
+cmake --build build --config Release --target all
+cd build
+ctest -j$(nproc)
+cd ..
+sudo cmake --build build --target install
+sudo ldconfig
+popd
+
+# gh_download_latest \"atcoder\" \"ac-library\"
+wget -q -O ac-library.tar.gz https://github.com/atcoder/ac-library/archive/refs/tags/v1.6.tar.gz
+mkdir atcoder-ac-library
+tar -C atcoder-ac-library -xf ac-library.tar.gz
+sudo cp -a --no-preserve=ownership atcoder-ac-library/*/atcoder /usr/local/include
+
+gh_download_latest \"boostorg\" \"boost\" \"b2-nodocs\" \"xz\" \"beta\"
+pushd boostorg-boost/*
+./bootstrap.sh --with-toolset=gcc --without-libraries=mpi,graph_parallel,python
+./b2 -j$(nproc) toolset=gcc variant=release cxxflags=\"-std=c++20\" stage
+sudo ./b2 -j$(nproc) toolset=gcc variant=release cxxflags=\"-std=c++20\" install
+popd
+
+gh_download_latest \"arximboldi\" \"immer\"
+pushd arximboldi-immer/*
+cmake -B build -Dimmer_BUILD_TESTS:BOOL=OFF -Dimmer_BUILD_DOCS:BOOL=OFF -Dimmer_BUILD_EXAMPLES:BOOL=OFF -G Ninja
+cmake --build build --config Release --target all
+sudo cmake --build build --target install
+popd
+
+AC_LIBTORCH_VERSION=\"$(gh_latest_version \"pytorch\" \"pytorch\")\"
+wget -q -O libtorch.zip https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-\"$AC_LIBTORCH_VERSION\"%2Bcpu.zip
+unzip -q libtorch.zip
+pushd libtorch
+sed -i 's/no-as-needed/as-needed/' share/cmake/Caffe2/Caffe2Targets.cmake
+sed -i 's/no-as-needed/as-needed/' share/cmake/Caffe2/public/utils.cmake
+sudo cp -a --no-preserve=ownership include share lib /usr/local/
+echo \"libtorch $AC_LIBTORCH_VERSION\" >> $HOME/library_version
+popd
+
+wget -q https://github.com/ei1333/library/archive/refs/heads/master.tar.gz
+mkdir ei1333-library
+tar -C ei1333-library --strip-components=1 -xf master.tar.gz
+pushd ei1333-library
+rm -fr .competitive-verifier .github docs test LICENSE README.md
+sudo mkdir /usr/local/include/ei1333
+sudo cp -a --no-preserve=ownership . /usr/local/include/ei1333
+AC_EI1333_VERSION=\"$(curl -s https://api.github.com/repos/ei1333/library/branches/master | grep -m 1 sha |cut -d'\"' -f4)\"
+echo \"ei1333-library $AC_EI1333_VERSION\" >> $HOME/library_version
+popd
+
+gh_download_latest \"martinus\" \"unordered_dense\"
+pushd martinus-unordered_dense/*
+cmake -B build -G Ninja
+sudo cmake --build build --target install
+popd
+
+gh_download_latest \"lightgbm-org\" \"LightGBM\" \"complete_source_code\" \"tar.gz\"
+pushd lightgbm-org-LightGBM
+cmake -B build -G Ninja
+cmake --build build
+sudo cmake --build build --target install
+popd
+
+wget -q -O scip.sh https://scipopt.org/download/release/SCIPOptSuite-9.2.3-Linux-ubuntu24.sh
+chmod +x scip.sh
+./scip.sh --skip-license --include-subdir --prefix=scip
+sudo cp -a --no-preserve=ownership scip/*/* /usr/local
+
+gh_download_latest \"ERGO-Code\" \"HiGHS\"
+pushd ERGO-Code-HiGHS/*
+cmake -S. -B build -G Ninja
+cmake --build build -j $(nproc)
+sudo cmake --install build
+popd
+
+# Pin OR-Tools to v9.14 to match AtCoder's environment.
+AC_ORTOOLS_VERSION=\"9.14\"
+wget -q -O or-tools.tar.gz https://github.com/google/or-tools/releases/download/v${AC_ORTOOLS_VERSION}/or-tools-${AC_ORTOOLS_VERSION}.tar.gz
+mkdir google-or-tools
+tar -C google-or-tools -xf or-tools.tar.gz
+echo \"google/or-tools $AC_ORTOOLS_VERSION\" >> $HOME/library_version
+pushd google-or-tools/*
+find . -type f -exec sed -i 's/SCIP::libscip/libscip/g' {} +
+cmake -B build -G Ninja -DBUILD_Protobuf:BOOL=ON -DBUILD_re2:BOOL=ON -DBUILD_CoinUtils:BOOL=ON -DBUILD_Osi:BOOL=ON -DBUILD_Clp:BOOL=ON -DBUILD_Cgl:BOOL=ON -DBUILD_Cbc:BOOL=ON -DUSE_HIGHS:BOOL=ON -DBUILD_SAMPLES:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_STANDARD=20
+cmake --build build --config Release --target all -j $(nproc)
+sudo cmake --build build --config Release --target install
+popd
+
+gh_download_latest \"ericniebler\" \"range-v3\"
+pushd ericniebler-range-v3/*
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DRANGE_V3_TESTS=OFF -DRANGE_V3_EXAMPLES=OFF
+sudo cmake --build build --target install
+popd
+
+gh_download_latest \"Z3Prover\" \"z3\"
+pushd Z3Prover-z3/*
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+sudo cmake --build build --target install
+popd
+
+popd
+sudo ldconfig
+
+# Create CMakeLists.txt
+
+cat << 'EOF' > CMakeLists.txt
+cmake_minimum_required(VERSION 3.28)
+project(main VERSION 1.0)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(absl REQUIRED)
+find_package(ortools REQUIRED)
+find_package(range-v3 REQUIRED)
+find_package(Torch REQUIRED)
+find_package(Z3 REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(PkgConfig  REQUIRED)
+pkg_check_modules(GMPXX REQUIRED gmpxx)
+find_package(Boost REQUIRED ALL)
+find_package(Immer REQUIRED)
+
+set(CMAKE_CXX_FLAGS_RELEASE \"-Wall -Wextra -O2 -fconstexpr-depth=2147483647 -fconstexpr-loop-limit=2147483647 -fconstexpr-ops-limit=2147483647 -fcoroutines -march=native -flto=auto -DATCODER -DONLINE_JUDGE\")
+set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}\")
+
+get_property(AC_ABSL_TARGETS DIRECTORY \"${CMAKE_SOURCE_DIR}\" PROPERTY IMPORTED_TARGETS)
+list(FILTER AC_ABSL_TARGETS INCLUDE REGEX \"^absl::\")
+
+add_executable(main main.cpp)
+target_link_libraries(main \"${TORCH_LIBRARIES}\" ortools::ortools ${AC_ABSL_TARGETS} _lightgbm ${Boost_ALL_TARGETS} ${Z3_LIBRARIES} Eigen3::Eigen ${GMPXX_LIBRARIES} stdc++exp)
+EOF
+
+cat << 'EOF' > main.clay
+{
+  cout << \"Hello\" << endl;
+}
+EOF
+clay < main.clay > main.cpp
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/main
+rm build/main main.cpp
+"""
+
+[[license]]
+name = "CC0-1.0"
+url = "https://github.com/laycrs/cLay/blob/main/LICENSE"
+
+[library.abseil]
+
+[[library.abseil.license]]
+name = "Apache-2.0"
+url = "https://github.com/abseil/abseil-cpp/blob/master/LICENSE"
+
+[library.ac-library]
+version = "1.6"
+
+[[library.ac-library.license]]
+name = "CC0-1.0"
+url = "https://github.com/atcoder/ac-library/blob/master/LICENSE"
+
+[library.boost]
+
+[[library.boost.license]]
+name = "BSL-1.0"
+url = "https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt"
+
+[library.immer]
+
+[[library.immer.license]]
+name = "BSL-1.0"
+url = "https://github.com/arximboldi/immer/blob/master/LICENSE"
+
+[library.ei1333-library]
+
+[[library.ei1333-library.license]]
+name = "Unlicense"
+url = "https://github.com/ei1333/library/blob/master/LICENSE"
+
+[library.eigen]
+
+[[library.eigen.license]]
+name = "MPL-2.0"
+url = "https://eigen.tuxfamily.org/index.php?title=Main_Page#License"
+
+[library.gmp]
+
+[[library.gmp.license]]
+name = "LGPL-3.0-only"
+url = "https://gmplib.org/#WHAT"
+
+[[library.gmp.license]]
+name = "GPL-2.0-only"
+url = "https://gmplib.org/#WHAT"
+
+[library.libtorch]
+
+[[library.libtorch.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/pytorch/pytorch/blob/main/LICENSE"
+
+[[library.libtorch.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[[library.libtorch.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[[library.libtorch.license]]
+name = "BSL-1.0"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[[library.libtorch.license]]
+name = "MIT-CMU"
+url = "https://github.com/pytorch/pytorch/blob/main/NOTICE"
+
+[library.unordered_dense]
+
+[[library.unordered_dense.license]]
+name = "MIT"
+url = "https://github.com/martinus/unordered_dense/blob/main/LICENSE"
+
+[library.lightgbm]
+
+[[library.lightgbm.license]]
+name = "MIT"
+url = "https://github.com/microsoft/LightGBM/blob/master/LICENSE"
+
+[library.highs]
+indirect = true
+
+[[library.highs.license]]
+name = "MIT"
+url = "https://github.com/ERGO-Code/HiGHS/blob/master/LICENSE.txt"
+
+[library.scip]
+indirect = true
+
+[[library.scip.license]]
+name = "Apache-2.0"
+url = "https://www.scipopt.org/scip/doc/html/LICENSE.php"
+
+[library.or-tools]
+
+[[library.or-tools.license]]
+name = "Apache-2.0"
+url = "https://github.com/google/or-tools/blob/stable/LICENSE"
+
+[library.range-v3]
+
+[[library.range-v3.license]]
+name = "BSL-1.0"
+url = "https://github.com/ericniebler/range-v3/blob/master/LICENSE.txt"
+
+[[library.range-v3.license]]
+name = "NCSA"
+url = "https://github.com/ericniebler/range-v3/blob/master/LICENSE.txt"
+
+[[library.range-v3.license]]
+name = "MIT"
+url = "https://github.com/ericniebler/range-v3/blob/master/LICENSE.txt"
+
+[[library.range-v3.license]]
+name = "!License-26"
+url = "https://github.com/ericniebler/range-v3/blob/master/LICENSE.txt"
+
+[[library.range-v3.license]]
+name = "!License-27"
+url = "https://github.com/ericniebler/range-v3/blob/master/LICENSE.txt"
+
+[library.z3]
+
+[[library.z3.license]]
+name = "MIT"
+url = "https://github.com/Z3Prover/z3/blob/master/LICENSE.txt"

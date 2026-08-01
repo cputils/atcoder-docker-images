@@ -1,0 +1,20 @@
+language = "Emojicode"
+display = "Emojicode 1.0 beta 2 (emojicodec 1.0 beta 2)"
+filename = "Main.🍇"
+object = "a.out"
+compile = "emojicodec Main.🍇 -O -o a.out 1>&2"
+execution = ["./a.out"]
+install = """
+sudo apt update && sudo apt install -y g++ rsync wget
+cd /tmp
+wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
+sudo apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
+wget https://github.com/emojicode/emojicode/releases/download/v1.0-beta.2/Emojicode-1.0-beta.2-Linux-x86_64.tar.gz -O emojicode.tar.gz
+tar -xzf emojicode.tar.gz && rm emojicode.tar.gz
+cd Emojicode-1.0-beta.2-Linux-x86_64
+yes | sudo ./install.sh
+"""
+
+[[license]]
+name = "Artistic-2.0"
+url = "https://github.com/emojicode/emojicode/blob/v1.0-beta.2/LICENSE"

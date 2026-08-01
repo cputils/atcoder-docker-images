@@ -1,0 +1,26 @@
+language = "Assembly MIPS"
+display = "Assembly MIPS O32 ABI (GNU assembler 2.42)"
+filename = "Main.s"
+object = "Main"
+compile = """
+mips-linux-gnu-as -o Main.o Main.s && mips-linux-gnu-ld -o Main Main.o
+"""
+execution = [
+  "qemu-mips",
+  "Main",
+]
+install = """
+sudo apt update
+sudo apt install -y binutils-mips-linux-gnu=2.42-* qemu-user=1:8.2.2+*
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=binutils/version.c;h=66254dd5743c6e9cfb63f85a1a97ee71c2b86858;hb=31fa6221bf88accee782e2c93cb869eee5d4113c"
+
+[library.QEMU]
+version = "8.2.2"
+
+[[library.QEMU.license]]
+name = "GPL-2.0"
+url = "https://www.qemu.org/docs/master/about/license.html"

@@ -1,0 +1,108 @@
+language = "Julia"
+display = "Julia (Julia 1.11.6)"
+filename = "Main.jl"
+object = "ok"
+compile = """
+export PATH=$PATH:/home/runner/.juliaup/bin
+julia -e \"Meta.parse(\\\"begin \\\" * read(\\\"Main.jl\\\",String) * \\\" end\\\")\" && touch ok && julia Main.jl ONLINE_JUDGE 2> /dev/null
+"""
+execution = [
+  "julia",
+  "--threads=auto",
+  "--startup-file=no",
+  "--history-file=no",
+  "Main.jl",
+]
+install = """
+sudo apt install -y curl
+# See: https://github.com/JuliaLang/juliaup
+curl -fsSL https://install.julialang.org | sh -s -- --yes --default-channel 1.11.6
+# Install Packages
+export PATH=$PATH:/home/runner/.juliaup/bin:/root/.juliaup/bin
+julia -e \"using Pkg; Pkg.update(); for (name, version) in map(p -> String.(split(p, '@')), ARGS) Pkg.add(name=name, version=version); end\" Combinatorics@1.0.3 DataStructures@0.18.22 DelimitedFiles@1.9.1 Distributions@0.25.120 InvertedIndices@1.3.1 IterTools@1.10.0 OffsetArrays@1.17.0 PrecompileTools@1.2.1 Primes@0.5.7 StaticArrays@1.9.14
+julia -e \"using Combinatorics, DataStructures, DelimitedFiles, Distributions, InvertedIndices, IterTools, OffsetArrays, PrecompileTools, Primes, StaticArrays\"
+juliaup config backgroundselfupdateinterval 0
+juliaup config startupselfupdateinterval 0
+juliaup config versionsdbupdateinterval 0
+"""
+
+[environment]
+PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.juliaup/bin"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/JuliaLang/julia/tree/master?tab=MIT-1-ov-file"
+
+[library.Combinatorics]
+version = "v1.0.3"
+
+[[library.Combinatorics.license]]
+name = "MIT"
+url = "https://github.com/JuliaMath/Combinatorics.jl/blob/master/LICENSE.md"
+
+[library.DataStructures]
+version = "v0.18.22"
+
+[[library.DataStructures.license]]
+name = "MIT"
+url = "https://github.com/JuliaCollections/DataStructures.jl/blob/master/License.md"
+
+[library.DelimitedFiles]
+version = "v1.9.1"
+
+[[library.DelimitedFiles.license]]
+name = "MIT"
+url = "https://github.com/JuliaData/DelimitedFiles.jl/blob/main/LICENSE"
+
+[library.Distributions]
+version = "v0.25.120"
+
+[[library.Distributions.license]]
+name = "MIT"
+url = "https://github.com/JuliaStats/Distributions.jl/blob/master/LICENSE.md"
+
+[library.InvertedIndices]
+version = "v1.3.1"
+
+[[library.InvertedIndices.license]]
+name = "MIT"
+url = "https://github.com/JuliaData/InvertedIndices.jl/blob/main/LICENSE.md"
+
+[library.IterTools]
+version = "v1.10.0"
+
+[[library.IterTools.license]]
+name = "MIT"
+url = "https://github.com/JuliaCollections/IterTools.jl/blob/master/LICENSE.md"
+
+[library.OffsetArrays]
+version = "v1.17.0"
+
+[[library.OffsetArrays.license]]
+name = "MIT"
+url = "https://github.com/JuliaArrays/OffsetArrays.jl/blob/master/LICENSE.md"
+
+[library.PrecompileTools]
+version = "v1.2.1"
+
+[[library.PrecompileTools.license]]
+name = "MIT"
+url = "https://github.com/JuliaLang/PrecompileTools.jl/blob/main/LICENSE"
+
+[library.Primes]
+version = "v0.5.7"
+
+[[library.Primes.license]]
+name = "MIT"
+url = "https://github.com/JuliaMath/Primes.jl/blob/master/LICENSE.md"
+
+[library.StaticArrays]
+version = "v1.9.14"
+
+[[library.StaticArrays.license]]
+name = "MIT"
+url = "https://github.com/JuliaArrays/StaticArrays.jl/blob/master/LICENSE.md"
+
+[[library.StaticArrays.license]]
+name = "BSL-1.0"
+url = "https://github.com/JuliaArrays/StaticArrays.jl/blob/master/LICENSE.md"

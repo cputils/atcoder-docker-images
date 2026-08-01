@@ -1,0 +1,29 @@
+language = "Piet"
+display = "Piet (your-diary/piet_programming_language 3.0.0) (PPM image)"
+filename = "Main.ppm"
+object = "ok"
+compile = """
+piet_programming_language --max-iter 0 Main.ppm && touch ok
+"""
+execution = [
+  "piet_programming_language",
+  "Main.ppm",
+]
+install = """
+sudo apt update
+export CARGO_HOME=/tmp/.cargo
+export RUSTUP_HOME=/tmp/.rustup
+sudo apt install -y rustup
+rustup default stable
+cd /tmp
+curl -O -L https://github.com/your-diary/piet_programming_language/archive/refs/tags/v3.0.0.tar.gz
+tar xf v3.0.0.tar.gz
+cd piet_programming_language-3.0.0
+cargo install --locked --path .
+sudo cp /tmp/.cargo/bin/piet_programming_language /usr/local/bin/
+sudo apt purge -y rustup
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/your-diary/piet_programming_language/blob/v3.0.0/LICENSE.txt"

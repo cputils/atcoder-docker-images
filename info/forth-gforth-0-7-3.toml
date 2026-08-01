@@ -1,0 +1,26 @@
+language = "Forth"
+display = "Forth (gforth 0.7.3)"
+filename = "Main.fs"
+execution = [
+  "gforth-fast",
+  "-m",
+  "100M",
+  "-d",
+  "100M",
+  "-r",
+  "100M",
+  "-f",
+  "100M",
+  "-l",
+  "100M",
+  "Main.fs",
+  "-e",
+  "bye",
+]
+install = """
+sudo apt -y install gforth
+"""
+
+[[license]]
+name = "GPL-3.0-only"
+url = "https://git.savannah.gnu.org/cgit/gforth.git/tree/COPYING"

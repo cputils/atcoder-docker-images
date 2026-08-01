@@ -1,0 +1,501 @@
+language = "Swift"
+display = "Swift 6.2"
+filename = "Package/Sources/main.swift"
+object = "Package/.build/release/Main"
+compile = """
+\nNUMBER=\"6.2\"
+VERSION=\"${NUMBER}-RELEASE\"
+PLATFORM=\"ubuntu24.04\"
+SWIFTC_COMMAND_PATH=\"$(pwd)/swift-${VERSION}-${PLATFORM}/usr/bin/swiftc\"
+SWIFT_COMMAND_PATH=\"$(pwd)/swift-${VERSION}-${PLATFORM}/usr/bin/swift\"
+
+export DEBIAN_FRONTEND=noninteractive
+# これがないとswift-ac-libraryのコンパイルが走ってしまう
+export SWIFT_AC_LIBRARY_USES_O_UNCHECKED=true
+export SWIFTPM_MAX_CONCURRENT_OPERATIONS=1
+export SWIFT_BACKTRACE='enable=yes,output-to=stderr,interactive=no'
+
+PACKAGE_NAME=\"Package\"
+PACKAGE_PATH=\"$(pwd)/${PACKAGE_NAME}\"
+EXECUTABLE_PATH=\"${PACKAGE_PATH}/.build/release/Main\"
+
+SCRIPT_DIRECTORY=\"Script\"
+SCRIPT_DIRECTORY_PATH=\"$(pwd)/${SCRIPT_DIRECTORY}\"
+SCRIPT_PATH=\"${SCRIPT_DIRECTORY_PATH}/build.sh\"
+
+# 差分コンパイルのログから抽出したコンパイルコマンドを実行します
+${SWIFTC_COMMAND_PATH} -module-name Main -emit-dependencies -emit-module -emit-module-path ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/Modules/Main.swiftmodule -output-file-map ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/Main.build/output-file-map.json -whole-module-optimization -num-threads 1 -c @${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/Main.build/sources -I ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/Modules -target x86_64-unknown-linux-gnu -whole-module-optimization -num-threads 1 -serialize-diagnostics -O -j1 -DSWIFT_PACKAGE -DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -Xcc -fmodule-map-file=${PACKAGE_PATH}/.build/checkouts/swift-numerics/Sources/_NumericsShims/include/module.modulemap -Xcc -I -Xcc ${PACKAGE_PATH}/.build/checkouts/swift-numerics/Sources/_NumericsShims/include -Xcc -fmodule-map-file=${PACKAGE_PATH}/.build/checkouts/accelerate-linux/Sources/CLAPACK/module.modulemap -I/usr/include/x86_64-linux-gnu -Xcc -fmodule-map-file=${PACKAGE_PATH}/.build/checkouts/accelerate-linux/Sources/CBLAS/module.modulemap -I/usr/include/x86_64-linux-gnu/openblas-pthread -Xcc -fmodule-map-file=${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/_MT19937.build/module.modulemap -Xcc -I -Xcc ${PACKAGE_PATH}/.build/checkouts/swift-ac-foundation/Sources/_MT19937/include -Xcc -fmodule-map-file=${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/_cxx.build/module.modulemap -Xcc -I -Xcc ${PACKAGE_PATH}/.build/checkouts/swift-ac-foundation/Sources/_cxx/include -Xcc -fmodule-map-file=${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/_FastIO.build/module.modulemap -Xcc -I -Xcc ${PACKAGE_PATH}/.build/checkouts/swift-ac-foundation/Sources/_FastIO/include -module-cache-path ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/ModuleCache  -Xfrontend -entry-point-function-name -Xfrontend Main_main -swift-version 6 -DONLINE_JUDGE -default-isolation nonisolated -g -Xcc -fPIC -Xcc -g -package-name package -Xfrontend -load-plugin-executable -Xfrontend ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/swift-ac-memoizeMacros-tool#swift_ac_memoizeMacros -Xcc -fno-omit-frame-pointer
+${SWIFTC_COMMAND_PATH} -L/usr/lib/x86_64-linux-gnu -llapacke -L/usr/lib/x86_64-linux-gnu/openblas-pthread -lopenblas -lstdc++ -L ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release -o ${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/Main -module-name Main -emit-executable -Xlinker --gc-sections -Xlinker --defsym -Xlinker main=Main_main -Xlinker '-rpath=$ORIGIN' @${PACKAGE_PATH}/.build/x86_64-unknown-linux-gnu/release/Main.product/Objects.LinkFileList -target x86_64-unknown-linux-gnu -lm -g
+
+# (抽出スクリプトでビルドする場合)
+# bash $SCRIPT_PATH 1>&2
+
+# (swiftコマンドでビルドする場合)
+# ビルドオプションが変化するとフルビルドとなるため、インストールスクリプトと揃える必要がある
+# ${SWIFT_COMMAND_PATH} \\
+#   build \\
+#   --product Main \\
+#   --build-system native \\
+#   --jobs 1 \\
+#   --configuration release \\
+#   --package-path $PACKAGE_PATH \\
+#   |& tee /dev/null
+
+if [ ! -f \"$EXECUTABLE_PATH\" ]; then
+  echo \"Error: Failed to build file '$EXECUTABLE_PATH'\" >&2
+  exit 1
+fi
+
+"""
+execution = ["Package/.build/release/Main"]
+install = """
+\n# 旧公式手順に従ってインストールを行います。
+# Alternate Install Options > Tarball > Instruction
+# https://www.swift.org/install/linux/tarball/
+
+NUMBER=\"6.2\"
+VERSION=\"${NUMBER}-RELEASE\"
+PLATFORM=\"ubuntu24.04\"
+TAR_FILE=\"swift-${VERSION}-${PLATFORM}.tar.gz\"
+# https://download.swift.org/swift-6.2-release/ubuntu2404/swift-6.2-RELEASE/swift-6.2-RELEASE-ubuntu24.04.tar.gz
+TAR_URL=\"https://download.swift.org/swift-${NUMBER}-release/$(echo $PLATFORM | tr -d .)/swift-${VERSION}/${TAR_FILE}\"
+
+SWIFT_COMMAND_PATH=\"$(pwd)/swift-${VERSION}-${PLATFORM}/usr/bin/swift\"
+
+PACKAGE_NAME=\"Package\"
+PACKAGE_PATH=\"$(pwd)/${PACKAGE_NAME}\"
+EXECUTABLE_PATH=\"${PACKAGE_PATH}/.build/release/Main\"
+
+SCRIPT_DIRECTORY=\"Script\"
+SCRIPT_DIRECTORY_PATH=\"$(pwd)/${SCRIPT_DIRECTORY}\"
+SCRIPT_PATH=\"${SCRIPT_DIRECTORY_PATH}/build.sh\"
+
+echo \"Current directory: $(pwd)\"
+echo \"Swift Command Path: ${SWIFT_COMMAND_PATH}\"
+echo \"Download URL: ${TAR_URL}\"
+
+export DEBIAN_FRONTEND=noninteractive
+
+# 一部のパッケージで-Ouncheckedを使用するように設定します
+export SWIFT_AC_LIBRARY_USES_O_UNCHECKED=true
+export SWIFTPM_MAX_CONCURRENT_OPERATIONS=1
+export SWIFT_BACKTRACE='enable=yes,output-to=stderr,interactive=no'
+
+sudo apt-get update
+
+# このスクリプトでは、まず言語環境を構築し、その後ビルド環境を構築します。
+
+# ここから、言語環境の構築を開始します。
+# 言語環境の構築では、Swift toolchainの展開を行います。
+# Swift toolchainの展開手順は、Swift公式サイトのGETTING STARTのINSTALL SWIFTに従います。
+
+# Linuxへのインストールの公式情報は以下です。
+# https://www.swift.org/install/linux/tarball/
+
+# 公式 1. Install required dependencies:
+sudo apt-get install -y \\
+             binutils \\
+             git \\
+             gnupg2 \\
+             libc6-dev \\
+             libcurl4-openssl-dev \\
+             libedit2 \\
+             libgcc-13-dev \\
+             libncurses-dev \\
+             libpython3-dev \\
+             libsqlite3-0 \\
+             libstdc++-13-dev \\
+             libxml2-dev \\
+             libz3-dev \\
+             pkg-config \\
+             tzdata \\
+             unzip \\
+             zlib1g-dev
+
+# 公式 2. Download the latest binary release.
+curl -s -O $TAR_URL
+
+# 公式 3. Import and verify the PGP signature:
+# $ gpg --keyserver hkp://keyserver.ubuntu.com \\
+#           --recv-keys \\
+#           'A62A E125 BBBF BB96 A6E0  42EC 925C C1CC ED3D 1561'\\
+#           'E813 C892 820A 6FA1 3755  B268 F167 DF1A CF9C E069'
+# この手順は省略します
+
+# 公式 4. Extract the archive with the following command:
+tar xzf $TAR_FILE
+
+# 公式 5. Add the Swift toolchain to your path as follows:
+# $ export PATH=/path/to/usr/bin:\"${PATH}\"
+# GitHub Actionsでの動作確認で、別のバイナリが実行されてしまい確認にならないため、実行パスの指定は直接行います
+
+# 公式のインストール手順は以上です
+
+# バージョン番号を出力し、ログでも処理系バージョンを確認する
+${SWIFT_COMMAND_PATH} --version
+
+# AtCoderからの要請で不要なファイルを削除するよう指示があるため、ダウンロードしたファイルを削除します
+rm $TAR_FILE
+
+# accelerate-linuxのビルドに必要なパッケージをインストールします
+sudo apt-get install -y \\
+  \"libopenblas-dev=0.3.26+ds-1\" \\
+  \"libopenblas0=0.3.26+ds-1\" \\
+  \"libopenblas-pthread-dev=0.3.26+ds-1\" \\
+  \"libopenblas0-pthread=0.3.26+ds-1\" \\
+  \"liblapacke-dev=3.12.0-3build1.1\" \\
+  \"liblapacke=3.12.0-3build1.1\" \\
+  \"libtmglib-dev=3.12.0-3build1.1\" \\
+  \"libtmglib3=3.12.0-3build1.1\"
+
+# これで言語環境の構築は完了しました
+
+# 続いて、コンパイル環境の構築を行います
+# コンパイル環境の構築では、AtCoderで使用するSwiftパッケージの初期化と依存パッケージの追加、そして事前ビルドを行います
+
+# ビルドスクリプトを配置するフォルダを作成
+mkdir $SCRIPT_DIRECTORY
+# パッケージを配置するフォルダを作成
+mkdir $PACKAGE_NAME
+
+cd $PACKAGE_NAME
+
+# ジャッジがビルドを行う作業パッケージの初期化を行います。パッケージ名はMain、実行可能なプログラムとして初期化します
+${SWIFT_COMMAND_PATH} package init --name Main --type executable
+
+# Package.swiftを更新し、AtCoderジャッジで使用する依存パッケージを作業パッケージに追加します
+cat << 'EOF' > Package.swift
+// swift-tools-version: 6.2
+import PackageDescription
+
+let package = Package(
+  name: \"Main\",
+  // @MainActorとRegexとType PackをmacOSローカルでパッケージを利用する場合に必要な設定値
+  platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17), .watchOS(.v10), .macCatalyst(.v17)],
+  dependencies: [
+    // swift 5.8.1時点での既存ライブラリです
+    .package(
+      url: \"https://github.com/apple/swift-collections\",
+      exact: \"1.2.1\"),
+    // swift 5.8.1時点での既存ライブラリです。
+    .package(
+      url: \"https://github.com/apple/swift-algorithms\",
+      exact: \"1.2.1\"),
+    // swift 5.8.1時点での既存ライブラリで、実数及び複素数です。
+    .package(
+      url: \"https://github.com/apple/swift-numerics\",
+      exact: \"1.1.0\"),
+    // 多倍長整数です。
+    .package(
+      url: \"https://github.com/attaswift/BigInt\",
+      exact: \"5.7.0\"),
+    // 有理数です。
+    // インストール手順がmainブランチ指定だったので、tagではなくrevision指定にしています。
+    .package(
+      url: \"https://github.com/dankogai/swift-bignum\",
+      revision: \"a562275f0a64bc95f6e3f6c45ee652eefa820749\"),
+    // SIMDです。
+    .package(
+      url: \"https://github.com/keyvariable/kvSIMD.swift\",
+      exact: \"1.1.0\"),
+    // BLAS及びLAPACKです。
+    .package(
+      url: \"https://github.com/brokenhandsio/accelerate-linux\",
+      revision: \"8eda308ea3129130e90e5c01fc437a4c5d2ca278\"),
+    // Atcoder LibraryのSwift版です。
+    .package(
+      url: \"https://github.com/narumij/swift-ac-library\",
+      // -Ouncheckedを利用するためにrevision指定としている
+      // tag - 0.1.29
+      revision: \"528c893e8d9b74acbfd455781e9a4bb6c5a5a262\"),
+    // 高速な入力、二分探索、その他便利関数です。
+    .package(
+      url: \"https://github.com/narumij/swift-ac-foundation\",
+      // .unsafeFlags([\"-std=c++17\"])に対するビルド拒否を迂回するため、revision指定としている
+      // branch - main
+      revision: \"9affe451d311e3c82c7eb3aefd06b22565cf1508\"),
+    // 平衡二分探索木と順列全列挙です。
+    .package(
+      url: \"https://github.com/narumij/swift-ac-collections\",
+      exact: \"0.1.44\"),
+    // メモ化マクロです。
+    // 事前ビルドが効かないことに対する暫定対処なため、revision指定としている
+    // branch - swift-6.2
+    .package(
+      url: \"https://github.com/narumij/swift-ac-memoize\",
+      revision: \"b99737071fd3cc156d66d972a6c72b89fc7150af\"),
+  ],
+  targets: [
+    .executableTarget(
+      name: \"Main\",
+      dependencies: [
+        .product(name: \"Collections\", package: \"swift-collections\"),
+        .product(name: \"Algorithms\", package: \"swift-algorithms\"),
+        .product(name: \"Numerics\", package: \"swift-numerics\"),
+        .product(name: \"BigInt\", package: \"BigInt\"),
+        .product(name: \"BigNum\", package: \"swift-bignum\"),
+        .product(name: \"kvSIMD\", package: \"kvSIMD.swift\"),
+        .product(name: \"AccelerateLinux\", package: \"accelerate-linux\"),
+        .product(name: \"AtCoder\", package: \"swift-ac-library\"),
+        .product(name: \"AcFoundation\", package: \"swift-ac-foundation\"),
+        .product(name: \"AcCollections\", package: \"swift-ac-collections\"),
+        .product(name: \"AcMemoize\", package: \"swift-ac-memoize\"),
+      ],
+      path: \"Sources\",
+      swiftSettings: [
+        .define(\"ONLINE_JUDGE\"),
+        .defaultIsolation(nil)
+      ]
+    )
+  ]
+)
+EOF
+
+# packageの構成が6.2で変わりました。今回は以前と同じ配置にします
+# Main.swiftとmain.swiftで挙動が異なり、main.swiftが向いているので、main.swiftにします
+# Main.swiftのままだと、後続の挙動がmain.swiftで動かなくなる
+# 具体的には、コンパイルコマンドの-parse-as-libraryの有無で動作が変わる
+rm Sources/Main/Main.swift
+rmdir Sources/Main
+cat << 'EOF' > Sources/main.swift
+print(\"Hello, world!\")
+EOF
+
+# 念の為に、クリーニングします
+${SWIFT_COMMAND_PATH} package clean
+
+# 依存パッケージの解決を行います
+${SWIFT_COMMAND_PATH} package resolve
+
+cd ../
+
+# 実行可能パッケージのビルドを行います
+# --product Mainは、observabilityScope制限の為に付与
+# --static-swift-stdlibは、Swift stdlibで静的リンクを行うオプション
+# --build-system nativeは、6.2になった場合の変動を避けるために付与
+# --jobs 1は、CPU数の変動によるフルビルドを迂回するために付与
+# --configuration releaseは、リリースビルドを行うためのオプション
+# |& tee /dev/nullは、環境情報収集に関してSPMにバグがあり、そのワークアラウンド
+# 1>&2は、頻繁にみかけるが、SPMの差分ビルド不具合を誘発する可能性が高いため付与しない
+${SWIFT_COMMAND_PATH} \\
+  build \\
+  --product Main \\
+  --build-system native \\
+  --jobs 1 \\
+  --configuration release \\
+  --package-path $PACKAGE_PATH \\
+  |& tee /dev/null
+
+# コマンド抽出用
+# ${SWIFT_COMMAND_PATH} \\
+#   build \\
+#   --product Main \\
+#   --build-system native \\
+#   --jobs 1 \\
+#   --configuration release \\
+#   --package-path $PACKAGE_PATH \\
+#   -v \\
+#   |& tee /dev/null
+
+# 差分コンパイルが行われるよう、ソースコードを変更します
+# sed -i 's/Hello/Hallo/' $PACKAGE_PATH/Sources/main.swift
+
+# 差分コンパイルを実施し、ビルドログを取得します
+# ${SWIFT_COMMAND_PATH} \\
+#   build \\
+#   --product Main \\
+#   --build-system native \\
+#   --jobs 1 \\
+#   --configuration release \\
+#   --package-path $PACKAGE_PATH \\
+#   -v > build.log
+
+# ビルドログからビルドコマンドを抽出し、差分ビルドスクリプトを作成します
+# sed -n '/swiftc/{
+#     s/ -v / /;
+#     s/-parseable-output//;
+#     s/ -j[0-9][0-9]*/ -j1/g;
+#     s/ -num-threads [0-9][0-9]*/ -num-threads 1/g;
+#     p
+# }' build.log > $SCRIPT_PATH
+
+# ビルドログを削除します
+# rm build.log
+
+# ビルド結果を削除します
+# rm $EXECUTABLE_PATH
+
+# 差分ビルドスクリプトを実行します
+# bash $SCRIPT_PATH
+
+# 差分コンパイルの不具合にさらに見舞われたため、抽出したスクリプトを元にコンパイルスクリプトを再度作成しました。
+
+if [ ! -f \"$EXECUTABLE_PATH\" ]; then
+  echo \"Error: 初回のビルドに失敗しました: $EXECUTABLE_PATH\" >&2
+  exit 1
+fi
+
+# Hello, world!を出力
+$EXECUTABLE_PATH
+
+# ジャッジによるビルド判定が正しく行われるよう、ビルド結果を削除します
+rm $EXECUTABLE_PATH
+
+"""
+
+[environment]
+DEBIAN_FRONTEND = "noninteractive"
+SWIFT_BACKTRACE = "enable=yes,output-to=stderr,interactive=no"
+SWIFTPM_MAX_CONCURRENT_OPERATIONS = "1"
+SWIFT_AC_LIBRARY_USES_O_UNCHECKED = "true"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/swiftlang/swift/blob/main/LICENSE.txt"
+
+[library.swift-algorithms]
+version = "1.2.1"
+
+[[library.swift-algorithms.license]]
+name = "Apache-2.0"
+url = "https://github.com/apple/swift-algorithms/blob/main/LICENSE.txt"
+
+[library.swift-collections]
+version = "1.2.1"
+
+[[library.swift-collections.license]]
+name = "Apache-2.0"
+url = "https://github.com/apple/swift-collections/blob/main/LICENSE.txt"
+
+[library.swift-numerics]
+version = "1.1.0"
+
+[[library.swift-numerics.license]]
+name = "Apache-2.0"
+url = "https://github.com/apple/swift-numerics/blob/main/LICENSE.txt"
+
+[library.swift-syntax]
+version = "602.0.0"
+indirect = true
+
+[[library.swift-syntax.license]]
+name = "Apache-2.0"
+url = "https://github.com/swiftlang/swift-syntax/blob/main/LICENSE.txt"
+
+[library.BigInt]
+version = "5.7.0"
+
+[[library.BigInt.license]]
+name = "MIT"
+url = "https://github.com/attaswift/BigInt/blob/master/LICENSE.md"
+
+[library.swift-bignum]
+version = "a562275"
+
+[[library.swift-bignum.license]]
+name = "MIT"
+url = "https://github.com/dankogai/swift-bignum/blob/main/LICENSE"
+
+[library."kvSIMD.swift"]
+version = "1.1.0"
+
+[[library."kvSIMD.swift".license]]
+name = "Apache-2.0"
+url = "https://github.com/keyvariable/kvSIMD.swift/blob/main/LICENSE"
+
+[library.accelerate-linux]
+version = "8eda308"
+
+[[library.accelerate-linux.license]]
+name = "MIT"
+url = "https://github.com/brokenhandsio/accelerate-linux/blob/main/LICENSE"
+
+[library.swift-ac-library]
+version = "528c893"
+
+[[library.swift-ac-library.license]]
+name = "CC0-1.0"
+url = "https://github.com/narumij/swift-ac-library/blob/main/LICENSE"
+
+[library.swift-ac-foundation]
+version = "9affe45"
+
+[[library.swift-ac-foundation.license]]
+name = "CC0-1.0"
+url = "https://github.com/narumij/swift-ac-foundation/blob/main/LICENSE"
+
+[library.swift-ac-collections]
+version = "0.1.44"
+
+[[library.swift-ac-collections.license]]
+name = "Apache-2.0"
+url = "https://github.com/narumij/swift-ac-collections/blob/main/LICENSE"
+
+[library.swift-ac-memoize]
+version = "b997370"
+
+[[library.swift-ac-memoize.license]]
+name = "Apache-2.0"
+url = "https://github.com/narumij/swift-ac-memoize/blob/main/LICENSE"
+
+[library.libopenblas-dev]
+version = "0.3.26+ds-1"
+
+[[library.libopenblas-dev.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/OpenMathLib/OpenBLAS/blob/develop/LICENSE"
+
+[library.libopenblas0]
+version = "0.3.26+ds-1"
+indirect = true
+
+[[library.libopenblas0.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/OpenMathLib/OpenBLAS/blob/develop/LICENSE"
+
+[library.libopenblas-pthread-dev]
+version = "0.3.26+ds-1"
+indirect = true
+
+[[library.libopenblas-pthread-dev.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/OpenMathLib/OpenBLAS/blob/develop/LICENSE"
+
+[library.libopenblas0-pthread]
+version = "0.3.26+ds-1"
+indirect = true
+
+[[library.libopenblas0-pthread.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/OpenMathLib/OpenBLAS/blob/develop/LICENSE"
+
+[library.liblapacke-dev]
+version = "3.12.0-3build1.1"
+
+[[library.liblapacke-dev.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/Reference-LAPACK/lapack/blob/master/LICENSE"
+
+[library.liblapacke]
+version = "3.12.0-3build1.1"
+indirect = true
+
+[[library.liblapacke.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/Reference-LAPACK/lapack/blob/master/LICENSE"
+
+[library.libtmglib-dev]
+version = "3.12.0-3build1.1"
+indirect = true
+
+[[library.libtmglib-dev.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/Reference-LAPACK/lapack/blob/master/LICENSE"
+
+[library.libtmglib3]
+version = "3.12.0-3build1.1"
+indirect = true
+
+[[library.libtmglib3.license]]
+name = "BSD-3-Clause-Open-MPI"
+url = "https://github.com/Reference-LAPACK/lapack/blob/master/LICENSE"

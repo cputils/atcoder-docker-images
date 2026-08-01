@@ -1,0 +1,79 @@
+language = "Crystal"
+display = "Crystal (Crystal 1.17.0)"
+filename = "main/src/main.cr"
+object = "main/bin/main"
+compile = """
+cd main && shards build --release --no-debug --no-color --quiet -Donline_judge 1>&2
+"""
+execution = ["./main/bin/main"]
+install = """
+sudo apt-get update
+sudo apt-get install -y gpg
+echo 'deb http://download.opensuse.org/repositories/devel:/languages:/crystal/xUbuntu_24.04/ /' | sudo tee /etc/apt/sources.list.d/devel:languages:crystal.list
+curl -fsSL https://download.opensuse.org/repositories/devel:languages:crystal/xUbuntu_24.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
+sudo apt-get update
+sudo apt-get install -y crystal1.17 libatlas-base-dev libgsl-dev git
+# 以下、project 作成
+mkdir main
+cd main
+crystal init app .
+cat >> shard.yml <<EOF
+dependencies:
+  atcoder:
+    github: hakatashi/ac-library.cr
+    commit: \"c57c18d\"
+  avltree:
+    github: ngng628/avltree
+    version: \"0.1.2\"
+  graphlb:
+    github: mettuaditya/graphlb
+    version: \"0.1.0\"
+  gsl:
+    github: konovod/crystal-gsl
+    commit: \"b1fc1b0\"
+  immutable:
+    github: lucaong/immutable
+    version: \"0.1.24\"
+EOF
+# install libraries in the project
+shards install --verbose
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/crystal-lang/crystal/blob/master/LICENSE"
+
+[library.ac-library_cr]
+version = "0.1.0 at c57c18d"
+
+[[library.ac-library_cr.license]]
+name = "Apache-2.0"
+url = "https://github.com/hakatashi/ac-library.cr/blob/master/LICENSE"
+
+[library.avltree]
+version = "0.1.2"
+
+[[library.avltree.license]]
+name = "MIT"
+url = "https://github.com/ngng628/avltree/blob/main/LICENSE"
+
+[library.graphlb]
+version = "0.1.0"
+
+[[library.graphlb.license]]
+name = "MIT"
+url = "https://github.com/mettuaditya/graphlb/blob/master/LICENSE"
+
+[library.gsl]
+version = "0.2.0 at b1fc1b0"
+
+[[library.gsl.license]]
+name = "GPL-3.0-only"
+url = "https://github.com/konovod/crystal-gsl/blob/master/LICENSE"
+
+[library.immutable]
+version = "0.1.24"
+
+[[library.immutable.license]]
+name = "MIT"
+url = "https://github.com/lucaong/immutable/blob/master/LICENSE"

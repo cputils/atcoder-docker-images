@@ -1,0 +1,203 @@
+language = "Ada"
+display = "Ada 2022 (GNAT 15.2.0)"
+filename = "src/main.adb"
+object = "obj/main"
+compile = """
+alr --no-color --no-tty build > /dev/null
+"""
+execution = ["./obj/main"]
+install = """
+AC2025_GNAT_VERSION=15
+AC2025_ALR_VERSION=2.1.0
+AC2025_GPRBUILD_VERSION=25.0.1
+
+sudo apt-get update
+sudo apt-get install --no-install-recommends -y software-properties-common
+sudo add-apt-repository -y ppa:puni070/gcc-noble
+sudo apt-get install -y git gnat-${AC2025_GNAT_VERSION} libgmp-dev libmpfr-dev libmpc-dev libisl-dev libzstd-dev zlib1g-dev xz-utils
+sudo apt-get --purge -y autoremove gcc
+
+do_update_alternatives() {
+  local link=$1
+  local packages=$2
+  local version=$3
+  local slaves=\"\"
+  local bins=$(dpkg -L $packages|grep -E \"^/usr/bin/.*-$version$\")
+  local bin
+  for bin in $bins
+  do
+    local name=$(basename \"$bin\"|sed \"s/-$version$//\")
+    if [ \"$name\" != \"$link\" ]; then
+      slaves+=\"--slave /usr/bin/$name $name /usr/bin/$name-$version \"
+    fi
+  done
+  sudo update-alternatives --quiet --install /usr/bin/$link $link /usr/bin/$link-$version 100 $slaves
+}
+
+do_update_alternatives \"gnat\" \"$(apt-cache depends --recurse --installed gnat-${AC2025_GNAT_VERSION} | grep -E \"^[A-z].*-${AC2025_GNAT_VERSION}.*\" | sort -u)\" ${AC2025_GNAT_VERSION}
+
+pushd /tmp
+
+# Install alr and configure toolchains
+wget -q -O alr.zip https://github.com/alire-project/alire/releases/download/v${AC2025_ALR_VERSION}/alr-${AC2025_ALR_VERSION}-bin-x86_64-linux.zip
+sudo unzip alr.zip -d /usr/local bin/alr
+
+alr -n --force toolchain --select gprbuild=${AC2025_GPRBUILD_VERSION}
+
+GPRBUILD_LATEST_VERSION=$(curl -sS 'https://api.launchpad.net/1.0/ubuntu/+archive/primary?ws.op=getPublishedSources&source_name=gprbuild&exact_match=true&distro_series=https://api.launchpad.net/1.0/ubuntu/plucky' | sed 's/,/\\n/g' | grep -m 1 version | awk '{ print $2 }' | sed 's/\"//g')
+wget -q -O gprbuild.tar.xz https://launchpad.net/ubuntu/+archive/primary/+files/gprbuild_${GPRBUILD_LATEST_VERSION}.debian.tar.xz
+
+tar xf gprbuild.tar.xz
+
+popd
+
+alr -n --force toolchain --select gnat_external
+
+# create project and install library
+libraries=(
+  \"bit_sets\" \\
+  \"euler_tools\" \\
+  \"gnatcoll\" \\
+  \"gnatcoll_gmp\" \\
+  \"hungarian\" \\
+)
+
+cat << 'EOF' > alire.toml
+name = \"main\"
+description = \"\"
+version = \"0.1.0\"
+EOF
+
+for library in \"${libraries[@]}\"
+do
+  alr -n with \"$library\"
+  if [ \"$library\" = \"gnatcoll\" ]; then
+    echo \"with \\\"gnatcoll_core\\\";\" >> main.gpr
+  else
+    echo \"with \\\"$library\\\";\" >> main.gpr
+  fi
+done
+
+alr -n update
+
+apply_libgpr_patch_if_present() {
+  local patch_file=\"/tmp/debian/patches/adapt-to-private-timeval.diff\"
+  local target_file=\"gpr/src/gpr-util-put_resource_usage__unix.adb\"
+
+  if [ ! -f \"$patch_file\" ]; then
+    echo \"Note: ${patch_file} not found; skipping libgpr patch.\"
+    return 0
+  fi
+
+  shopt -s nullglob
+  local candidates=(
+    \"$HOME/.local/share/alire/releases/libgpr_\"*
+    \"$HOME/.local/share/alire/builds/libgpr_\"*/*
+  )
+  shopt -u nullglob
+
+  local patched_any=0
+  local dir
+
+  for dir in \"${candidates[@]}\"
+  do
+    if [ ! -d \"$dir\" ] || [ ! -f \"$dir/$target_file\" ]; then
+      continue
+    fi
+
+    pushd \"$dir\"
+    if grep -q \"System.C_Time\" \"$target_file\"; then
+      popd
+      patched_any=1
+      continue
+    fi
+
+    if ! patch -p1 < \"$patch_file\"; then
+      popd
+      echo \"ERROR: Failed to apply libgpr patch in $dir\" >&2
+      return 1
+    fi
+    popd
+    patched_any=1
+  done
+
+  if [ \"$patched_any\" -eq 0 ]; then
+    echo \"Note: libgpr sources not found in Alire cache; skipping patch.\"
+  fi
+}
+
+apply_libgpr_patch_if_present || exit 1
+
+
+cat << 'EOF' >> main.gpr
+project Main is
+   for Source_Dirs use (\"src\");
+   for Object_Dir  use \"obj\";
+   for Main use (\"main.adb\");
+   package Compiler is
+     for Default_Switches (\"Ada\") use (\"-gnat2022\", \"-O2\");
+   end Compiler;
+end Main;
+EOF
+
+mkdir src
+
+cat << 'EOF' > src/main.adb
+with GNATCOLL.GMP.Integers; use GNATCOLL.GMP.Integers;
+with GNATCOLL.GMP.Integers.IO; use GNATCOLL.GMP.Integers.IO;
+with Interfaces.C; use Interfaces.C;
+
+procedure Main is
+    function System (Arg : in Char_Array) return Integer;
+    pragma Import(C, System, \"system\");
+    Ret : Integer;
+    A, B : Big_Integer;
+
+begin
+  Ret := System(To_C(\"alr show --tree\"));
+  Set (A, \"999999999999999999999999999999999999999999\", 10);
+  Set (B, \"999999999999999999999999999999999999999999\", 10);
+  Put (A * B);
+end Main;
+EOF
+
+alr --no-color --no-tty build
+./obj/main
+rm obj/main
+"""
+
+[[license]]
+name = "GPL-3.0-only"
+url = "https://gcc.gnu.org/onlinedocs/gcc-15.2.0/gcc/Copying.html"
+
+[library.bit_sets]
+
+[[library.bit_sets.license]]
+name = "GPL-2.0-or-later"
+url = "https://alire.ada.dev/crates/bit_sets"
+
+[library.euler_tools]
+
+[[library.euler_tools.license]]
+name = "MIT"
+url = "https://alire.ada.dev/crates/euler_tools"
+
+[library.gnatcoll]
+
+[[library.gnatcoll.license]]
+name = "GPL-3.0-or-later"
+url = "https://alire.ada.dev/crates/gnatcoll"
+exception = "GCC-exception-3.1"
+
+[library.gnatcoll_gmp]
+
+[[library.gnatcoll_gmp.license]]
+name = "GPL-3.0-or-later"
+url = "https://alire.ada.dev/crates/gnatcoll_gmp"
+exception = "GCC-exception-3.1"
+
+[library.hungarian]
+
+[[library.hungarian.license]]
+name = "LGPL-3.0-only"
+url = "https://alire.ada.dev/crates/hungarian"

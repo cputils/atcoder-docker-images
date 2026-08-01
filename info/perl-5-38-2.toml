@@ -1,0 +1,22 @@
+language = "Perl"
+display = "Perl (perl 5.38.2)"
+filename = "Main.pl"
+object = "ok"
+compile = """
+perl -c Main.pl && touch ok
+"""
+execution = [
+  "perl",
+  "Main.pl",
+]
+install = """
+sudo apt install -y perl=5.38.2-3.2ubuntu0.2
+"""
+
+[[license]]
+name = "GPL-1.0-or-later"
+url = "https://dev.perl.org/licenses/"
+
+[[license]]
+name = "Artistic-1.0-Perl"
+url = "https://dev.perl.org/licenses/"

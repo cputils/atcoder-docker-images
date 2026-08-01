@@ -1,0 +1,302 @@
+language = "Dart"
+display = "Dart (Dart 3.9.2)"
+filename = "judge/bin/judge.dart"
+object = "a.out"
+compile = """
+dart compile exe judge/bin/judge.dart -o a.out
+"""
+execution = ["./a.out"]
+install = """
+AC_DART_VERSION=3.9.2
+sudo apt-get update
+sudo apt-get install -y libz3-dev
+pushd /tmp
+wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${AC_DART_VERSION}/linux_packages/dart_${AC_DART_VERSION}-1_amd64.deb
+sudo dpkg -i dart_${AC_DART_VERSION}-1_amd64.deb
+dart --disable-analytics
+popd
+
+dart create judge
+pushd judge
+dart pub add \\
+  advance_math \\
+  bit_array \\
+  collection \\
+  decimal \\
+  fast_immutable_collections \\
+  min_max_heap \\
+  more \\
+  ordered_set \\
+  scidart \\
+  segment_tree \\
+  sorted_list \\
+  sortedmap \\
+  z3
+
+dart pub remove test lints
+
+cat << 'EOF' > bin/judge.dart
+import 'dart:ffi';
+import 'dart:io';
+import 'package:z3/z3.dart';
+
+void main() async {
+  libz3Override = DynamicLibrary.open('/usr/lib/x86_64-linux-gnu/libz3.so');
+  print('z3 version: $z3GlobalVersion');
+  print('z3 full version: $z3GlobalFullVersion');
+  final result = await Process.run(
+    'dart',
+    ['pub', 'deps'],
+    workingDirectory: '/judge/judge'
+  );
+  print(result.stdout);
+}
+EOF
+popd
+dart compile exe judge/bin/judge.dart -o a.out
+./a.out
+rm a.out
+"""
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/dart-lang/sdk/blob/main/LICENSE"
+
+[library.advance_math]
+
+[[library.advance_math.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/advance_math"
+
+[library.bit_array]
+
+[[library.bit_array.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/bit_array"
+
+[library.collection]
+
+[[library.collection.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/collection"
+
+[library.decimal]
+
+[[library.decimal.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/decimal"
+
+[library.fast_immutable_collections]
+
+[[library.fast_immutable_collections.license]]
+name = "BSD-2-Clause"
+url = "https://pub.dev/packages/fast_immutable_collections"
+
+[library.min_max_heap]
+
+[[library.min_max_heap.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/min_max_heap"
+
+[library.more]
+
+[[library.more.license]]
+name = "MIT"
+url = "https://pub.dev/packages/more"
+
+[library.ordered_set]
+
+[[library.ordered_set.license]]
+name = "MIT"
+url = "https://pub.dev/packages/ordered_set"
+
+[library.scidart]
+
+[[library.scidart.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/scidart"
+
+[library.segment_tree]
+
+[[library.segment_tree.license]]
+name = "!License-21"
+url = "https://pub.dev/packages/segment_tree"
+
+[library.sorted_list]
+
+[[library.sorted_list.license]]
+name = "MIT"
+url = "https://pub.dev/packages/sorted_list"
+
+[library.sortedmap]
+
+[[library.sortedmap.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/sortedmap"
+
+[library.z3]
+
+[[library.z3.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/z3"
+
+[library.async]
+indirect = true
+
+[[library.async.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/async"
+
+[library.boolean_selector]
+indirect = true
+
+[[library.boolean_selector.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/boolean_selector"
+
+[library.buffer]
+indirect = true
+
+[[library.buffer.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/buffer"
+
+[library.characters]
+indirect = true
+
+[[library.characters.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/characters"
+
+[library.clock]
+indirect = true
+
+[[library.clock.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/clock"
+
+[library.dartframe]
+indirect = true
+
+[[library.dartframe.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/dartframe"
+
+[library.ffi]
+indirect = true
+
+[[library.ffi.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/ffi"
+
+[library.intl]
+indirect = true
+
+[[library.intl.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/intl"
+
+[library.logging]
+indirect = true
+
+[[library.logging.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/logging"
+
+[library.matcher]
+indirect = true
+
+[[library.matcher.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/matcher"
+
+[library.meta]
+indirect = true
+
+[[library.meta.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/meta"
+
+[library.package_config]
+indirect = true
+
+[[library.package_config.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/package_config"
+
+[library.path]
+indirect = true
+
+[[library.path.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/path"
+
+[library.petitparser]
+indirect = true
+
+[[library.petitparser.license]]
+name = "MIT"
+url = "https://pub.dev/packages/petitparser"
+
+[library.pub_semver]
+indirect = true
+
+[[library.pub_semver.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/pub_semver"
+
+[library.quiver]
+indirect = true
+
+[[library.quiver.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/quiver"
+
+[library.rational]
+indirect = true
+
+[[library.rational.license]]
+name = "Apache-2.0"
+url = "https://pub.dev/packages/rational"
+
+[library.source_span]
+indirect = true
+
+[[library.source_span.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/source_span"
+
+[library.stack_trace]
+indirect = true
+
+[[library.stack_trace.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/stack_trace"
+
+[library.stream_channel]
+indirect = true
+
+[[library.stream_channel.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/stream_channel"
+
+[library.string_scanner]
+indirect = true
+
+[[library.string_scanner.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/string_scanner"
+
+[library.term_glyph]
+indirect = true
+
+[[library.term_glyph.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/term_glyph"
+
+[library.test_api]
+indirect = true
+
+[[library.test_api.license]]
+name = "BSD-3-Clause"
+url = "https://pub.dev/packages/test_api"

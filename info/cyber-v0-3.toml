@@ -1,0 +1,22 @@
+language = "Cyber"
+display = "Cyber (Cyber v0.3)"
+filename = "Main.cy"
+object = "ok"
+compile = """
+if cyber compile Main.cy > compile-out 2>&1; then
+  touch ok
+else
+  cat compile-out 1>&2
+fi
+"""
+execution = [
+  "cyber",
+  "Main.cy",
+]
+install = """
+curl -fsSL https://cyberscript.dev/install.sh | bash
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/fubark/cyber/blob/master/LICENSE"

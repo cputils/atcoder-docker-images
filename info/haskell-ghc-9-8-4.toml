@@ -1,0 +1,1379 @@
+language = "Haskell"
+display = "Haskell (GHC 9.8.4)"
+name = "GHC"
+version = "9.8.4"
+filename = "submission/app/Main.hs"
+object = "main"
+compile = """
+cd submission
+source ~/.ghcup/env
+cabal v2-build --offline && cp $(cabal list-bin main) ../
+"""
+execution = ["./main"]
+install = """
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y --no-install-recommends build-essential ca-certificates curl libffi-dev libffi8ubuntu1 libgmp-dev libgmp10 libncurses-dev libncurses6 libtinfo6 llvm-15
+
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_MINIMAL=1 sh
+mkdir -p ~/.cabal
+source ~/.ghcup/env
+ghcup install cabal 3.14.2.0 && ghcup set cabal 3.14.2.0
+ghcup install ghc 9.8.4 && ghcup set ghc 9.8.4
+
+sudo apt-get install -y --no-install-recommends libgsl0-dev liblapack-dev libatlas-base-dev libglpk-dev
+
+mkdir -p submission/app
+
+cd submission
+
+cat > submission.cabal <<'PKG_CABAL_EOF'
+cabal-version:      3.4
+name:               submission
+version:            0.1.0.0
+synopsis:           A Haskell program submitted to AtCoder
+-- description:
+license:            NONE
+author:             submitter-anonymous
+maintainer:         NONE
+-- copyright:
+category:           Competitive
+build-type:         Simple
+-- extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+common warnings
+    ghc-options: -Wall
+
+flag atcoder
+    description:    Indicates this is on the AtCoder judge server
+    default:        False
+    manual:         True
+
+executable main
+    import:           warnings
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+                  Cabal ^>=3.16.0.0,
+                  Cabal-syntax ^>=3.16.0.0,
+                  QuickCheck ^>=2.16.0.0,
+                  ac-library-hs ^>=1.5.3.0,
+                  adjunctions ^>=4.4.3,
+                  array ==0.5.8.0,
+                  attoparsec ^>=0.14.4,
+                  base ==4.19.2.0,
+                  bifunctors ^>=5.6.2,
+                  binary ^>=0.8.9.3,
+                  bitvec ^>=1.1.5.0,
+                  bytestring ^>=0.12.2.0,
+                  comonad ^>=5.0.9,
+                  containers ^>=0.8,
+                  contravariant ^>=1.5.5,
+                  deepseq ==1.5.1.0,
+                  directory ^>=1.3.9.0,
+                  distributive ^>=0.6.2.1,
+                  exceptions ^>=0.10.7,
+                  extra ^>=1.8,
+                  fgl ^>=5.8.3.0,
+                  filepath ^>=1.4.301.0,
+                  flow ^>=2.0.0.9,
+                  free ^>=5.2,
+                  ghc-bignum ==1.3,
+                  ghc-boot-th ==9.8.4,
+                  ghc-prim ==0.11.0,
+                  hashable ^>=1.5.0.0,
+                  heaps ^>=0.4.1,
+                  hmatrix ^>=0.20.2,
+                  hmatrix-glpk ^>=0.19.0.0,
+                  hmatrix-gsl ^>=0.19.0.1,
+                  hmatrix-special ^>=0.19.0.0,
+                  ilist ^>=0.4.0.1,
+                  indexed-traversable ^>=0.1.4,
+                  indexed-traversable-instances ^>=0.1.2,
+                  integer-gmp ^>=1.1,
+                  integer-logarithms ^>=1.0.4,
+                  kan-extensions ^>=5.2.7,
+                  lens ^>=5.3.5,
+                  linear-base ^>=0.5.0,
+                  list-t ^>=1.0.5.7,
+                  massiv ^>=1.0.5.0,
+                  megaparsec ^>=9.7.0,
+                  monad-memo ^>=0.5.4,
+                  mono-traversable ^>=1.0.21.0,
+                  mtl ^>=2.3.1,
+                  mutable-containers ^>=0.3.4.1,
+                  mwc-random ^>=0.15.2.0,
+                  parallel ^>=3.2.2.0,
+                  parsec ^>=3.1.18.0,
+                  parser-combinators ^>=1.3.0,
+                  pretty ^>=1.1.3.6,
+                  primitive ^>=0.9.1.0,
+                  process ^>=1.6.26.1,
+                  profunctors ^>=5.6.3,
+                  psqueues ^>=0.2.8.2,
+                  random ^>=1.3.1,
+                  reflection ^>=2.1.9,
+                  regex-tdfa ^>=1.3.2.4,
+                  safe-exceptions ^>=0.1.7.4,
+                  scientific ^>=0.3.8.0,
+                  semialign ^>=1.3.1,
+                  semigroupoids ^>=6.0.1,
+                  split ^>=0.2.5,
+                  stm ^>=2.5.3.1,
+                  strict ^>=0.5.1,
+                  strict-lens ^>=0.4.1,
+                  tagged ^>=0.8.9,
+                  template-haskell ==2.21.0.0,
+                  text ^>=2.1.3,
+                  tf-random ^>=0.5,
+                  these ^>=1.2.1,
+                  these-lens ^>=1.0.2,
+                  time ^>=1.12.2,
+                  transformers ^>=0.6.1.0,
+                  trifecta ^>=2.1.4,
+                  unboxing-vector ^>=0.2.0.0,
+                  unix ==2.8.6.0,
+                  unordered-containers ^>=0.2.20,
+                  utility-ht ^>=0.0.17.2,
+                  vector ^>=0.13.2.0,
+                  vector-algorithms ^>=0.9.1.0,
+                  vector-split ^>=1.0.0.4,
+                  vector-stream ^>=0.1.0.1,
+                  vector-th-unbox ^>=0.2.2,
+                  wide-word ^>=0.1.7.1,
+                  witherable ^>=0.5,
+                  xhtml ^>=3000.2.2.1
+
+    hs-source-dirs:   app
+    default-language: GHC2021
+    if flag(atcoder)
+      cpp-options: -DATCODER
+
+PKG_CABAL_EOF
+
+cat > cabal.project <<'CABAL_PROJECT_EOF'
+packages: ./submission.cabal
+
+constraints: bitvec +libgmp,
+             -- clock +llvm,
+             text +simdutf,
+             vector-algorithms +llvm
+optimization: 2
+
+package *
+    compiler: ghc
+    ghc-options: -fllvm -Wall
+
+allow-newer: witherable:containers,
+             semialign:containers,
+             scientific:containers,
+             parallel:containers,
+             megaparsec:containers,
+             foldl:containers,
+             linear-generics:containers,
+             indexed-traversable:containers,
+             hashable:containers
+
+CABAL_PROJECT_EOF
+
+cat > cabal.project.freeze <<'CABAL_PROJECT_FREEZE_EOF'
+active-repositories: hackage.haskell.org:merge
+constraints: any.Cabal ==3.16.0.0,
+             Cabal -git-rev,
+             any.Cabal-syntax ==3.16.0.0,
+             any.OneTuple ==0.4.2,
+             any.QuickCheck ==2.16.0.0,
+             QuickCheck -old-random +templatehaskell,
+             any.StateVar ==1.2.2,
+             any.ac-library-hs ==1.5.3.0,
+             any.adjunctions ==4.4.3,
+             any.alex ==3.5.4.0,
+             any.ansi-terminal ==1.1.3,
+             ansi-terminal -example,
+             any.ansi-terminal-types ==1.1.3,
+             any.array ==0.5.8.0,
+             any.assoc ==1.1.1,
+             assoc -tagged,
+             any.atomic-primops ==0.8.8,
+             atomic-primops -debug,
+             any.attoparsec ==0.14.4,
+             attoparsec -developer,
+             any.base ==4.19.2.0,
+             any.base-orphans ==0.9.3,
+             any.bifunctors ==5.6.2,
+             bifunctors +tagged,
+             any.binary ==0.8.9.3,
+             any.bitvec ==1.1.5.0,
+             bitvec +simd,
+             any.blaze-builder ==0.4.4.1,
+             any.blaze-html ==0.9.2.0,
+             any.blaze-markup ==0.8.3.0,
+             any.bytestring ==0.12.2.0,
+             bytestring -pure-haskell,
+             any.call-stack ==0.4.0,
+             any.case-insensitive ==1.2.1.0,
+             any.charset ==0.3.12,
+             any.clock ==0.8.4,
+             clock -llvm,
+             any.colour ==2.3.6,
+             any.comonad ==5.0.9,
+             comonad +containers +distributive +indexed-traversable,
+             any.containers ==0.8,
+             any.contravariant ==1.5.5,
+             contravariant +semigroups +statevar +tagged,
+             any.data-default-class ==0.1.2.2,
+             any.deepseq ==1.5.1.0,
+             any.directory ==1.3.9.0,
+             directory -os-string,
+             any.distributive ==0.6.2.1,
+             distributive +semigroups +tagged,
+             any.exceptions ==0.10.7,
+             any.extra ==1.8,
+             any.fgl ==5.8.3.0,
+             fgl +containers042,
+             any.file-io ==0.1.5,
+             file-io -os-string,
+             any.filepath ==1.4.301.0,
+             filepath -cpphs,
+             any.fingertree ==0.1.6.2,
+             any.flow ==2.0.0.9,
+             flow -pedantic,
+             any.foldl ==1.4.18,
+             any.free ==5.2,
+             any.ghc-bignum ==1.3,
+             any.ghc-boot-th ==9.8.4,
+             any.ghc-prim ==0.11.0,
+             any.hashable ==1.5.0.0,
+             hashable -arch-native -random-initial-seed,
+             any.heaps ==0.4.1,
+             any.hmatrix ==0.20.2,
+             hmatrix -disable-default-paths -no-random_r -openblas,
+             any.hmatrix-glpk ==0.19.0.0,
+             hmatrix-glpk -disable-default-paths,
+             any.hmatrix-gsl ==0.19.0.1,
+             hmatrix-gsl -disable-default-paths +onlygsl,
+             any.hmatrix-special ==0.19.0.0,
+             hmatrix-special -safe-cheap,
+             any.ilist ==0.4.0.1,
+             any.indexed-traversable ==0.1.4,
+             any.indexed-traversable-instances ==0.1.2,
+             any.integer-gmp ==1.1,
+             any.integer-logarithms ==1.0.4,
+             integer-logarithms -check-bounds +integer-gmp,
+             any.invariant ==0.6.4,
+             any.kan-extensions ==5.2.7,
+             any.lens ==5.3.5,
+             lens -benchmark-uniplate -dump-splices +inlining -j +test-hunit +test-properties +test-templates +trustworthy,
+             any.linear-base ==0.5.0,
+             any.linear-generics ==0.2.3,
+             any.list-t ==1.0.5.7,
+             any.logict ==0.8.2.0,
+             any.massiv ==1.0.5.0,
+             massiv -unsafe-checks,
+             any.math-functions ==0.3.4.4,
+             math-functions +system-erf +system-expm1,
+             any.megaparsec ==9.7.0,
+             megaparsec -dev,
+             any.mmorph ==1.2.1,
+             any.monad-control ==1.0.3.1,
+             any.monad-memo ==0.5.4,
+             any.mono-traversable ==1.0.21.0,
+             any.mtl ==2.3.1,
+             any.mutable-containers ==0.3.4.1,
+             any.mwc-random ==0.15.2.0,
+             mwc-random -benchpapi,
+             any.optparse-applicative ==0.19.0.0,
+             optparse-applicative +process,
+             any.os-string ==2.0.8,
+             any.parallel ==3.2.2.0,
+             any.parsec ==3.1.18.0,
+             any.parser-combinators ==1.3.0,
+             parser-combinators -dev,
+             any.parsers ==0.12.12,
+             parsers +attoparsec +binary +parsec,
+             any.pretty ==1.1.3.6,
+             any.prettyprinter ==1.7.1,
+             prettyprinter -buildreadme +text,
+             any.prettyprinter-ansi-terminal ==1.1.3,
+             any.primitive ==0.9.1.0,
+             any.process ==1.6.26.1,
+             process -os-string,
+             any.profunctors ==5.6.3,
+             any.psqueues ==0.2.8.2,
+             any.pvar ==1.0.0.0,
+             any.random ==1.3.1,
+             any.reducers ==3.12.5,
+             any.reflection ==2.1.9,
+             reflection -slow +template-haskell,
+             any.regex-base ==0.94.0.3,
+             any.regex-tdfa ==1.3.2.4,
+             regex-tdfa +doctest -force-o2,
+             any.rts ==1.0.2,
+             any.safe-exceptions ==0.1.7.4,
+             any.scheduler ==2.0.1.0,
+             any.scientific ==0.3.8.0,
+             scientific -integer-simple,
+             any.semialign ==1.3.1,
+             semialign +semigroupoids,
+             any.semigroupoids ==6.0.1,
+             semigroupoids +comonad +containers +contravariant +distributive +tagged +unordered-containers,
+             any.semigroups ==0.20,
+             semigroups +binary +bytestring -bytestring-builder +containers +deepseq +hashable +tagged +template-haskell +text +transformers +unordered-containers,
+             any.split ==0.2.5,
+             any.splitmix ==0.1.3.1,
+             splitmix -optimised-mixer,
+             any.stm ==2.5.3.1,
+             any.storable-complex ==0.2.3.0,
+             any.storable-record ==0.0.7,
+             storable-record -buildtests +splitbase,
+             any.storable-tuple ==0.1,
+             storable-tuple +splitbase,
+             any.strict ==0.5.1,
+             any.strict-lens ==0.4.1,
+             any.system-cxx-std-lib ==1.0,
+             any.tagged ==0.8.9,
+             tagged +deepseq +transformers,
+             any.tasty ==1.5.3,
+             tasty +unix,
+             any.template-haskell ==2.21.0.0,
+             any.text ==2.1.3,
+             text -developer -extendedbenchmarks -pure-haskell +simdutf,
+             any.tf-random ==0.5,
+             any.th-abstraction ==0.7.1.0,
+             any.these ==1.2.1,
+             any.these-lens ==1.0.2,
+             any.time ==1.12.2,
+             any.transformers ==0.6.1.0,
+             any.transformers-base ==0.4.6,
+             transformers-base +orphaninstances,
+             any.transformers-compat ==0.7.2,
+             transformers-compat -five +five-three -four +generic-deriving +mtl -three -two,
+             any.trifecta ==2.1.4,
+             any.unboxing-vector ==0.2.0.0,
+             unboxing-vector +mono-traversable,
+             any.unix ==2.8.6.0,
+             unix -os-string,
+             any.unliftio-core ==0.2.1.0,
+             any.unordered-containers ==0.2.20,
+             unordered-containers -debug,
+             any.utf8-string ==1.0.2,
+             any.utility-ht ==0.0.17.2,
+             any.vector ==0.13.2.0,
+             vector +boundschecks -internalchecks -unsafechecks -wall,
+             any.vector-algorithms ==0.9.1.0,
+             vector-algorithms +bench +boundschecks -internalchecks +llvm -unsafechecks,
+             any.vector-split ==1.0.0.4,
+             any.vector-stream ==0.1.0.1,
+             any.vector-th-unbox ==0.2.2,
+             any.void ==0.7.3,
+             void -safe,
+             any.wide-word ==0.1.7.1,
+             any.witherable ==0.5,
+             any.xhtml ==3000.2.2.1
+index-state: hackage.haskell.org 2025-09-07T04:34:43Z
+
+CABAL_PROJECT_FREEZE_EOF
+
+echo \"main = return () :: IO ()\" > app/Main.hs
+cabal v2-update
+cabal v2-configure --flags=\"+atcoder\"
+# cabal v2-freeze
+cabal v2-build --only-dependencies
+rm app/Main.hs
+"""
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://www.haskell.org/ghc/license.html"
+
+[library.Cabal]
+version = "3.16.0.0"
+
+[[library.Cabal.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/Cabal/src/LICENSE"
+
+[library.Cabal-syntax]
+version = "3.16.0.0"
+
+[[library.Cabal-syntax.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/Cabal-syntax/src/LICENSE"
+
+[library.OneTuple]
+version = "0.4.2"
+indirect = true
+
+[[library.OneTuple.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/OneTuple/src/LICENSE"
+
+[library.QuickCheck]
+version = "2.16.0.0"
+
+[[library.QuickCheck.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/QuickCheck/src/LICENSE"
+
+[library.StateVar]
+version = "1.2.2"
+indirect = true
+
+[[library.StateVar.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/StateVar/src/LICENSE"
+
+[library.ac-library-hs]
+version = "1.5.3.0"
+
+[[library.ac-library-hs.license]]
+name = "CC0-1.0"
+url = "https://hackage.haskell.org/package/ac-library-hs/src/LICENSE"
+
+[library.adjunctions]
+version = "4.4.3"
+
+[[library.adjunctions.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/adjunctions/src/LICENSE"
+
+[library.alex]
+version = "3.5.4.0"
+
+[[library.alex.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/alex/src/LICENSE"
+
+[library.ansi-terminal]
+version = "1.1.3"
+indirect = true
+
+[[library.ansi-terminal.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/ansi-terminal/src/LICENSE"
+
+[library.ansi-terminal-types]
+version = "1.1.3"
+indirect = true
+
+[[library.ansi-terminal-types.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/ansi-terminal-types/src/LICENSE"
+
+[library.array]
+version = "0.5.8.0"
+
+[[library.array.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/array/src/LICENSE"
+
+[library.assoc]
+version = "1.1.1"
+indirect = true
+
+[[library.assoc.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/assoc/src/LICENSE"
+
+[library.atomic-primops]
+version = "0.8.8"
+indirect = true
+
+[[library.atomic-primops.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/atomic-primops/src/LICENSE"
+
+[library.attoparsec]
+version = "0.14.4"
+
+[[library.attoparsec.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/attoparsec/src/LICENSE"
+
+[library.base]
+version = "4.19.2.0"
+
+[[library.base.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/base/src/LICENSE"
+
+[library.base-orphans]
+version = "0.9.3"
+indirect = true
+
+[[library.base-orphans.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/base-orphans/src/LICENSE"
+
+[library.bifunctors]
+version = "5.6.2"
+
+[[library.bifunctors.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/bifunctors/src/LICENSE"
+
+[library.binary]
+version = "0.8.9.3"
+
+[[library.binary.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/binary/src/LICENSE"
+
+[library.bitvec]
+version = "1.1.5.0"
+
+[[library.bitvec.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/bitvec/src/LICENSE"
+
+[library.blaze-builder]
+version = "0.4.4.1"
+indirect = true
+
+[[library.blaze-builder.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/blaze-builder/src/LICENSE"
+
+[library.blaze-html]
+version = "0.9.2.0"
+indirect = true
+
+[[library.blaze-html.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/blaze-html/src/LICENSE"
+
+[library.blaze-markup]
+version = "0.8.3.0"
+indirect = true
+
+[[library.blaze-markup.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/blaze-markup/src/LICENSE"
+
+[library.bytestring]
+version = "0.12.2.0"
+
+[[library.bytestring.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/bytestring/src/LICENSE"
+
+[library.call-stack]
+version = "0.4.0"
+indirect = true
+
+[[library.call-stack.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/call-stack/src/LICENSE"
+
+[library.case-insensitive]
+version = "1.2.1.0"
+indirect = true
+
+[[library.case-insensitive.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/case-insensitive/src/LICENSE"
+
+[library.charset]
+version = "0.3.12"
+indirect = true
+
+[[library.charset.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/charset/src/LICENSE"
+
+[library.clock]
+version = "0.8.4"
+indirect = true
+
+[[library.clock.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/clock/src/LICENSE"
+
+[library.colour]
+version = "2.3.6"
+indirect = true
+
+[[library.colour.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/colour/src/LICENSE"
+
+[library.comonad]
+version = "5.0.9"
+
+[[library.comonad.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/comonad/src/LICENSE"
+
+[library.containers]
+version = "0.8"
+
+[[library.containers.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/containers/src/LICENSE"
+
+[library.contravariant]
+version = "1.5.5"
+
+[[library.contravariant.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/contravariant/src/LICENSE"
+
+[library.data-default-class]
+version = "0.1.2.2"
+indirect = true
+
+[[library.data-default-class.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/data-default-class/src/LICENSE"
+
+[library.deepseq]
+version = "1.5.1.0"
+
+[[library.deepseq.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/deepseq/src/LICENSE"
+
+[library.directory]
+version = "1.3.9.0"
+
+[[library.directory.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/directory/src/LICENSE"
+
+[library.distributive]
+version = "0.6.2.1"
+
+[[library.distributive.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/distributive/src/LICENSE"
+
+[library.exceptions]
+version = "0.10.7"
+
+[[library.exceptions.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/exceptions/src/LICENSE"
+
+[library.extra]
+version = "1.8"
+
+[[library.extra.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/extra/src/LICENSE"
+
+[library.fgl]
+version = "5.8.3.0"
+
+[[library.fgl.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/fgl/src/LICENSE"
+
+[library.filepath]
+version = "1.4.301.0"
+
+[[library.filepath.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/filepath/src/LICENSE"
+
+[library.file-io]
+version = "0.1.5"
+indirect = true
+
+[[library.file-io.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/file-io/src/LICENSE"
+
+[library.fingertree]
+version = "0.1.6.2"
+indirect = true
+
+[[library.fingertree.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/fingertree/src/LICENSE"
+
+[library.flow]
+version = "2.0.0.9"
+
+[[library.flow.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/flow/src/LICENSE.txt"
+
+[library.foldl]
+version = "1.4.18"
+indirect = true
+
+[[library.foldl.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/foldl/src/LICENSE"
+
+[library.free]
+version = "5.2"
+
+[[library.free.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/free/src/LICENSE"
+
+[library.ghc-bignum]
+version = "1.3"
+
+[[library.ghc-bignum.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/ghc-bignum/src/LICENSE"
+
+[library.ghc-prim]
+version = "0.11.0"
+
+[[library.ghc-prim.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/ghc-prim/src/LICENSE"
+
+[library.hashable]
+version = "1.5.0.0"
+
+[[library.hashable.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/hashable/src/LICENSE"
+
+[library.heaps]
+version = "0.4.1"
+
+[[library.heaps.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/heaps/src/LICENSE"
+
+[library.hmatrix]
+version = "0.20.2"
+
+[[library.hmatrix.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/hmatrix/src/LICENSE"
+
+[library.hmatrix-glpk]
+version = "0.19.0.0"
+
+[[library.hmatrix-glpk.license]]
+name = "GPL-3.0-only"
+url = "https://hackage.haskell.org/package/hmatrix-glpk/src/LICENSE"
+
+[library.hmatrix-gsl]
+version = "0.19.0.1"
+
+[[library.hmatrix-gsl.license]]
+name = "GPL-3.0-only"
+url = "https://hackage.haskell.org/package/hmatrix-gsl/src/LICENSE"
+
+[library.hmatrix-special]
+version = "0.19.0.0"
+
+[[library.hmatrix-special.license]]
+name = "GPL-3.0-only"
+url = "https://hackage.haskell.org/package/hmatrix-special/src/LICENSE"
+
+[library.ilist]
+version = "0.4.0.1"
+
+[[library.ilist.license]]
+name = "MPL-2.0"
+url = "https://hackage.haskell.org/package/ilist/src/LICENSE"
+
+[library.indexed-traversable]
+version = "0.1.4"
+
+[[library.indexed-traversable.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/indexed-traversable/src/LICENSE"
+
+[library.indexed-traversable-instances]
+version = "0.1.2"
+
+[[library.indexed-traversable-instances.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/indexed-traversable-instances/src/LICENSE"
+
+[library.integer-gmp]
+version = "1.1"
+
+[[library.integer-gmp.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/integer-gmp/src/LICENSE"
+
+[library.integer-logarithms]
+version = "1.0.4"
+
+[[library.integer-logarithms.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/integer-logarithms/src/LICENSE"
+
+[library.invariant]
+version = "0.6.4"
+indirect = true
+
+[[library.invariant.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/invariant/src/LICENSE"
+
+[library.kan-extensions]
+version = "5.2.7"
+
+[[library.kan-extensions.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/kan-extensions/src/LICENSE"
+
+[library.lens]
+version = "5.3.5"
+
+[[library.lens.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/lens/src/LICENSE"
+
+[library.linear-base]
+version = "0.5.0"
+
+[[library.linear-base.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/linear-base/src/LICENSE"
+
+[library.linear-generics]
+version = "0.2.3"
+indirect = true
+
+[[library.linear-generics.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/linear-generics/src/LICENSE"
+
+[library.list-t]
+version = "1.0.5.7"
+
+[[library.list-t.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/list-t/src/LICENSE"
+
+[library.logict]
+version = "0.8.2.0"
+indirect = true
+
+[[library.logict.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/logict/src/LICENSE"
+
+[library.massiv]
+version = "1.0.5.0"
+
+[[library.massiv.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/massiv/src/LICENSE"
+
+[library.math-functions]
+version = "0.3.4.4"
+indirect = true
+
+[[library.math-functions.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/math-functions/src/LICENSE"
+
+[library.megaparsec]
+version = "9.7.0"
+
+[[library.megaparsec.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/megaparsec/src/LICENSE.md"
+
+[library.mmorph]
+version = "1.2.1"
+indirect = true
+
+[[library.mmorph.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/mmorph/src/LICENSE"
+
+[library.monad-control]
+version = "1.0.3.1"
+indirect = true
+
+[[library.monad-control.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/monad-control/src/LICENSE"
+
+[library.monad-memo]
+version = "0.5.4"
+
+[[library.monad-memo.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/monad-memo/src/LICENSE"
+
+[library.mono-traversable]
+version = "1.0.21.0"
+
+[[library.mono-traversable.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/mono-traversable/src/LICENSE"
+
+[library.mtl]
+version = "2.3.1"
+
+[[library.mtl.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/mtl/src/LICENSE"
+
+[library.mutable-containers]
+version = "0.3.4.1"
+
+[[library.mutable-containers.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/mutable-containers/src/LICENSE"
+
+[library.mwc-random]
+version = "0.15.2.0"
+
+[[library.mwc-random.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/mwc-random/src/LICENSE"
+
+[library.optparse-applicative]
+version = "0.19.0.0"
+indirect = true
+
+[[library.optparse-applicative.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/optparse-applicative/src/LICENSE"
+
+[library.os-string]
+version = "2.0.8"
+indirect = true
+
+[[library.os-string.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/os-string/src/LICENSE"
+
+[library.parallel]
+version = "3.2.2.0"
+
+[[library.parallel.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/parallel/src/LICENSE"
+
+[library.parsec]
+version = "3.1.18.0"
+
+[[library.parsec.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/parsec/src/LICENSE"
+
+[library.parser-combinators]
+version = "1.3.0"
+
+[[library.parser-combinators.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/parser-combinators/src/LICENSE.md"
+
+[library.parsers]
+version = "0.12.12"
+indirect = true
+
+[[library.parsers.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/parsers/src/LICENSE"
+
+[library.pretty]
+version = "1.1.3.6"
+
+[[library.pretty.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/pretty/src/LICENSE"
+
+[library.prettyprinter]
+version = "1.7.1"
+indirect = true
+
+[[library.prettyprinter.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/prettyprinter/src/LICENSE.md"
+
+[library.prettyprinter-ansi-terminal]
+version = "1.1.3"
+indirect = true
+
+[[library.prettyprinter-ansi-terminal.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/prettyprinter-ansi-terminal/src/LICENSE.md"
+
+[library.primitive]
+version = "0.9.1.0"
+
+[[library.primitive.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/primitive/src/LICENSE"
+
+[library.process]
+version = "1.6.26.1"
+
+[[library.process.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/process/src/LICENSE"
+
+[library.profunctors]
+version = "5.6.3"
+
+[[library.profunctors.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/profunctors/src/LICENSE"
+
+[library.psqueues]
+version = "0.2.8.2"
+
+[[library.psqueues.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/psqueues/src/LICENSE"
+
+[library.pvar]
+version = "1.0.0.0"
+indirect = true
+
+[[library.pvar.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/pvar/src/LICENSE"
+
+[library.random]
+version = "1.3.1"
+
+[[library.random.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/random/src/LICENSE"
+
+[library.reducers]
+version = "3.12.5"
+indirect = true
+
+[[library.reducers.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/reducers/src/LICENSE"
+
+[library.reflection]
+version = "2.1.9"
+
+[[library.reflection.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/reflection/src/LICENSE"
+
+[library.regex-base]
+version = "0.94.0.3"
+indirect = true
+
+[[library.regex-base.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/regex-base/src/LICENSE"
+
+[library.regex-tdfa]
+version = "1.3.2.4"
+
+[[library.regex-tdfa.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/regex-tdfa/src/LICENSE"
+
+[library.safe-exceptions]
+version = "0.1.7.4"
+
+[[library.safe-exceptions.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/safe-exceptions/src/LICENSE"
+
+[library.scheduler]
+version = "2.0.1.0"
+indirect = true
+
+[[library.scheduler.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/scheduler/src/LICENSE"
+
+[library.scientific]
+version = "0.3.8.0"
+
+[[library.scientific.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/scientific/src/LICENSE"
+
+[library.semialign]
+version = "1.3.1"
+
+[[library.semialign.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/semialign/src/LICENSE"
+
+[library.semigroupoids]
+version = "6.0.1"
+
+[[library.semigroupoids.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/semigroupoids/src/LICENSE"
+
+[library.semigroups]
+version = "0.20"
+indirect = true
+
+[[library.semigroups.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/semigroups/src/LICENSE"
+
+[library.split]
+version = "0.2.5"
+
+[[library.split.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/split/src/LICENSE"
+
+[library.splitmix]
+version = "0.1.3.1"
+indirect = true
+
+[[library.splitmix.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/splitmix/src/LICENSE"
+
+[library.stm]
+version = "2.5.3.1"
+
+[[library.stm.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/stm/src/LICENSE"
+
+[library.storable-complex]
+version = "0.2.3.0"
+indirect = true
+
+[[library.storable-complex.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/storable-complex/src/LICENSE"
+
+[library.storable-record]
+version = "0.0.7"
+indirect = true
+
+[[library.storable-record.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/storable-record/src/LICENSE"
+
+[library.storable-tuple]
+version = "0.1"
+indirect = true
+
+[[library.storable-tuple.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/storable-tuple/src/LICENSE"
+
+[library.strict]
+version = "0.5.1"
+
+[[library.strict.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/strict/src/LICENSE"
+
+[library.strict-lens]
+version = "0.4.1"
+
+[[library.strict-lens.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/strict-lens/src/LICENSE"
+
+[library.tagged]
+version = "0.8.9"
+
+[[library.tagged.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/tagged/src/LICENSE"
+
+[library.tasty]
+version = "1.5.3"
+
+[[library.tasty.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/tasty/src/LICENSE"
+
+[library.template-haskell]
+version = "2.21.0.0"
+
+[[library.template-haskell.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/template-haskell/src/LICENSE"
+
+[library.text]
+version = "2.1.3"
+
+[[library.text.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/text/src/LICENSE"
+
+[library.tf-random]
+version = "0.5"
+
+[[library.tf-random.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/tf-random/src/LICENSE"
+
+[library.th-abstraction]
+version = "0.7.1.0"
+indirect = true
+
+[[library.th-abstraction.license]]
+name = "ISC"
+url = "https://hackage.haskell.org/package/th-abstraction/src/LICENSE"
+
+[library.these]
+version = "1.2.1"
+
+[[library.these.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/these/src/LICENSE"
+
+[library.these-lens]
+version = "1.0.2"
+
+[[library.these-lens.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/these-lens/src/LICENSE"
+
+[library.time]
+version = "1.12.2"
+
+[[library.time.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/time/src/LICENSE"
+
+[library.transformers]
+version = "0.6.1.0"
+
+[[library.transformers.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/transformers/src/LICENSE"
+
+[library.transformers-base]
+version = "0.4.6"
+indirect = true
+
+[[library.transformers-base.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/transformers-base/src/LICENSE"
+
+[library.transformers-compat]
+version = "0.7.2"
+indirect = true
+
+[[library.transformers-compat.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/transformers-compat/src/LICENSE"
+
+[library.trifecta]
+version = "2.1.4"
+
+[[library.trifecta.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/trifecta/src/LICENSE"
+
+[library.unboxing-vector]
+version = "0.2.0.0"
+
+[[library.unboxing-vector.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/unboxing-vector/src/LICENSE"
+
+[library.unix]
+version = "2.8.6.0"
+
+[[library.unix.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/unix/src/LICENSE"
+
+[library.unliftio-core]
+version = "0.2.1.0"
+indirect = true
+
+[[library.unliftio-core.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/unliftio-core/src/LICENSE"
+
+[library.unordered-containers]
+version = "0.2.20"
+
+[[library.unordered-containers.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/unordered-containers/src/LICENSE"
+
+[library.utf8-string]
+version = "1.0.2"
+indirect = true
+
+[[library.utf8-string.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/utf8-string/src/LICENSE"
+
+[library.utility-ht]
+version = "0.0.17.2"
+
+[[library.utility-ht.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/utility-ht/src/LICENSE"
+
+[library.vector]
+version = "0.13.2.0"
+
+[[library.vector.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/vector/src/LICENSE"
+
+[library.vector-algorithms]
+version = "0.9.1.0"
+
+[[library.vector-algorithms.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/vector-algorithms/src/LICENSE"
+
+[library.vector-split]
+version = "1.0.0.4"
+
+[[library.vector-split.license]]
+name = "MIT"
+url = "https://hackage.haskell.org/package/vector-split/src/LICENSE"
+
+[library.vector-stream]
+version = "0.1.0.1"
+
+[[library.vector-stream.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/vector-stream/src/LICENSE"
+
+[library.vector-th-unbox]
+version = "0.2.2"
+
+[[library.vector-th-unbox.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/vector-th-unbox/src/LICENSE"
+
+[library.void]
+version = "0.7.3"
+indirect = true
+
+[[library.void.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/void/src/LICENSE"
+
+[library.wide-word]
+version = "0.1.7.1"
+
+[[library.wide-word.license]]
+name = "BSD-2-Clause"
+url = "https://hackage.haskell.org/package/wide-word/src/LICENSE"
+
+[library.witherable]
+version = "0.5"
+
+[[library.witherable.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/witherable/src/LICENSE"
+
+[library.xhtml]
+version = "3000.2.2.1"
+
+[[library.xhtml.license]]
+name = "BSD-3-Clause"
+url = "https://hackage.haskell.org/package/xhtml/src/LICENSE"

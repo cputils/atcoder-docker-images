@@ -1,0 +1,24 @@
+language = "Brainfuck"
+display = "Brainfuck (Tritium 1.2.73)"
+filename = "Main.bf"
+execution = [
+  "tritium",
+  "-b",
+  "-e",
+  "Main.bf",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y git
+pushd /tmp
+git clone https://github.com/rdebath/Brainfuck
+cd Brainfuck
+git checkout 14a729d
+cd tritium
+make
+sudo make install
+"""
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://github.com/rdebath/Brainfuck/tree/master"

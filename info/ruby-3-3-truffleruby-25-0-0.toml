@@ -1,0 +1,848 @@
+language = "Ruby"
+display = "Ruby 3.3 (truffleruby 25.0.0)"
+filename = "Main.rb"
+object = "syntax_ok"
+compile = """
+export PATH=$HOME/.rubies/truffleruby/bin:$PATH
+ruby -c Main.rb && touch syntax_ok && ruby Main.rb ONLINE_JUDGE 2> /dev/null
+"""
+execution = [
+  "sh",
+  "ruby.sh",
+  "{memory:mb}",
+]
+install = """
+AC_GRAAL_VERSION=25.0.0
+
+sudo apt-get update
+sudo apt-get install -y libssl-dev libyaml-dev zlib1g-dev libz3-dev libgeos-dev
+
+pushd /tmp
+wget -q -O truffleruby.tar.gz https://github.com/oracle/truffleruby/releases/download/graal-${AC_GRAAL_VERSION}/truffleruby-${AC_GRAAL_VERSION}-linux-amd64.tar.gz
+mkdir -p $HOME/.rubies/truffleruby
+tar -C $HOME/.rubies/truffleruby --strip-components=1 -xf truffleruby.tar.gz
+$HOME/.rubies/truffleruby/lib/truffle/post_install_hook.sh
+export PATH=$HOME/.rubies/truffleruby/bin:$PATH
+
+AC_LIBTORCH_VERSION=\"2.8.0\"
+wget -q -O libtorch.zip https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-\"$AC_LIBTORCH_VERSION\"%2Bcpu.zip
+unzip -q libtorch.zip
+pushd libtorch
+sudo cp -dR include /usr/local/
+sudo cp -dR lib /usr/local/
+echo /usr/local/lib/libtorch | sudo tee /etc/ld.so.conf.d/libtorch.conf
+echo \"libtorch $AC_LIBTORCH_VERSION\" >> $HOME/library_version
+popd
+
+popd
+
+# list default gems for license information
+gem list -q --no-versions > /tmp/default-gems
+
+# create a script to run ruby specifying stack and heap size
+cat << 'EOF' > ruby.sh
+#! /bin/sh
+stack_size=$(($1 * 25 / 100))
+heap_size=$(($1 * 90 / 100))
+ruby --vm.Xmx\"$heap_size\"M --vm.Xss\"$stack_size\"M Main.rb
+EOF
+
+# install libraries
+export MAKEFLAGS=\"-j$(nproc)\"
+gem install -N rice -v 4.6.1
+
+gem install -N --conservative \\
+ac-library-rb:1.2.0 \\
+bit_utils:0.1.2 \\
+bitarray:1.3.1 \\
+faster_prime:1.0.2 \\
+ffi-geos:2.5.0 \\
+immutable-ruby:0.2.0 \\
+lightgbm:0.4.3 \\
+or-tools:0.16.0 \\
+rbtree:0.4.6 \\
+rgl:0.6.6 \\
+sorted_containers:1.1.0 \\
+sorted_set:1.0.3 \\
+torch-rb:0.21.0 \\
+z3:0.0.20230311 \\
+
+"""
+
+[environment]
+PATH = "/home/runner/.rubies/truffleruby/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[[license]]
+name = "!License-28"
+url = "https://www.oracle.com/downloads/licenses/graal-free-license.html"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/abbrev"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/abbrev"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/base64"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/base64"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/benchmark"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/benchmark"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/bigdecimal"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/bigdecimal"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/bundler"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/cgi"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/cgi"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/csv"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/csv"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/date"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/date"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/debug"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/debug"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/delegate"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/delegate"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/did_you_mean"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/digest"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/digest"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/drb"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/drb"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/english"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/english"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/erb"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/erb"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/error_highlight"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/etc"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/etc"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/fcntl"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/fcntl"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/fiddle"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/fiddle"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/fileutils"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/fileutils"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/find"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/find"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/forwardable"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/forwardable"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/getoptlong"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/getoptlong"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/io-console"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/io-console"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/io-nonblock"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/io-nonblock"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/io-wait"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/io-wait"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/ipaddr"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/ipaddr"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/irb"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/irb"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/json"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/logger"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/logger"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/matrix"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/matrix"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/minitest"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/mutex_m"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/mutex_m"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/net-ftp"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/net-ftp"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/net-http"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/net-http"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/net-imap"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/net-imap"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/net-pop"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/net-pop"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/net-protocol"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/net-protocol"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/net-smtp"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/net-smtp"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/nkf"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/nkf"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/observer"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/observer"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/open-uri"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/open-uri"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/open3"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/open3"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/openssl"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/optparse"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/optparse"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/ostruct"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/ostruct"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/pathname"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/pathname"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/power_assert"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/power_assert"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/pp"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/pp"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/prettyprint"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/prettyprint"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/prime"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/prime"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/prism"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/pstore"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/pstore"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/psych"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/racc"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/racc"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/rake"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/rbs"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/rbs"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/rdoc"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/readline"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/reline"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/resolv"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/resolv"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/resolv-replace"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/resolv-replace"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/rexml"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/rinda"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/rinda"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/rss"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/ruby2_keywords"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/ruby2_keywords"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/securerandom"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/securerandom"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/set"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/set"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/shellwords"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/shellwords"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/singleton"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/singleton"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/stringio"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/stringio"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/strscan"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/strscan"
+
+[[license]]
+name = "MIT"
+url = "https://rubygems.org/gems/syntax_suggest"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/syslog"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/syslog"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/tempfile"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/tempfile"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/test-unit"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/test-unit"
+
+[[license]]
+name = "PSF-2.0"
+url = "https://rubygems.org/gems/test-unit"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/time"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/time"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/timeout"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/timeout"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/tmpdir"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/tmpdir"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/tsort"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/tsort"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/un"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/un"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/uri"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/uri"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/weakref"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/weakref"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/yaml"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/yaml"
+
+[[license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/zlib"
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/zlib"
+
+[library.ac-library-rb]
+version = "1.2.0"
+
+[[library.ac-library-rb.license]]
+name = "CC0-1.0"
+url = "https://rubygems.org/gems/ac-library-rb"
+
+[library.backports]
+indirect = true
+
+[[library.backports.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/backports"
+
+[library.bit_utils]
+version = "0.1.2"
+
+[[library.bit_utils.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/bit_utils"
+
+[library.bitarray]
+version = "1.3.1"
+
+[[library.bitarray.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/bitarray"
+
+[library.concurrent-ruby]
+indirect = true
+
+[[library.concurrent-ruby.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/concurrent-ruby"
+
+[library.faster_prime]
+version = "1.0.2"
+
+[[library.faster_prime.license]]
+name = "MIT"
+url = "https://github.com/mame/faster_prime"
+
+[library.ffi]
+indirect = true
+
+[[library.ffi.license]]
+name = "BSD-3-Clause"
+url = "https://rubygems.org/gems/ffi"
+
+[library.ffi-geos]
+version = "2.5.0"
+
+[[library.ffi-geos.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/ffi-geos"
+
+[library.function_module]
+indirect = true
+
+[[library.function_module.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/function_module"
+
+[library.immutable-ruby]
+version = "0.2.0"
+
+[[library.immutable-ruby.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/immutable-ruby"
+
+[library.lightgbm]
+version = "0.4.3"
+
+[[library.lightgbm.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/lightgbm"
+
+[library.or-tools]
+version = "0.16.0"
+
+[[library.or-tools.license]]
+name = "Apache-2.0"
+url = "https://rubygems.org/gems/or-tools"
+
+[library.pairing_heap]
+indirect = true
+
+[[library.pairing_heap.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/pairing_heap"
+
+[library.rbtree]
+version = "0.4.6"
+
+[[library.rbtree.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/rbtree"
+
+[library.rgl]
+version = "0.6.6"
+
+[[library.rgl.license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/rgl"
+
+[library.rice]
+version = "4.6.1"
+
+[[library.rice.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/rice"
+
+[library.sorted_containers]
+version = "1.1.0"
+
+[[library.sorted_containers.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/sorted_containers"
+
+[library.sorted_set]
+version = "1.0.3"
+
+[[library.sorted_set.license]]
+name = "BSD-2-Clause"
+url = "https://rubygems.org/gems/sorted_set"
+
+[library.stream]
+indirect = true
+
+[[library.stream.license]]
+name = "Ruby"
+url = "https://rubygems.org/gems/stream"
+
+[library.torch-rb]
+version = "0.21.0"
+
+[[library.torch-rb.license]]
+name = "BSD-3-Clause"
+url = "https://rubygems.org/gems/torch-rb"
+
+[library.z3]
+version = "0.0.20230311"
+
+[[library.z3.license]]
+name = "MIT"
+url = "https://rubygems.org/gems/z3"

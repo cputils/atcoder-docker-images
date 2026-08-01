@@ -1,0 +1,70 @@
+language = "Go"
+display = "Go (go 1.25.1)"
+filename = "main.go"
+object = "a.out"
+compile = """
+export PATH=$PATH:/opt/go/bin
+go build -o a.out
+"""
+execution = ["./a.out"]
+install = """
+AC_GO_VERSION=1.25.1
+pushd /tmp
+wget -q https://go.dev/dl/go${AC_GO_VERSION}.linux-amd64.tar.gz
+sudo tar -C /opt -xf go${AC_GO_VERSION}.linux-amd64.tar.gz
+popd
+export PATH=$PATH:/opt/go/bin
+# create project and install libraries
+go mod init atcoder.jp/golang
+go get \\
+github.com/emirpasic/gods \\
+gonum.org/v1/gonum \\
+github.com/liyue201/gostl \\
+github.com/benbjohnson/immutable \\
+golang.org/x/exp \\
+github.com/monkukui/ac-library-go
+"""
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/golang/go/blob/master/LICENSE"
+
+[library.gods]
+
+[[library.gods.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/emirpasic/gods/blob/master/LICENSE"
+
+[[library.gods.license]]
+name = "ISC"
+url = "https://github.com/emirpasic/gods/blob/master/LICENSE"
+
+[library.gonum]
+
+[[library.gonum.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/gonum/gonum/blob/master/LICENSE"
+
+[library.gostl]
+
+[[library.gostl.license]]
+name = "MIT"
+url = "https://github.com/liyue201/gostl/blob/master/LICENSE"
+
+[library.immutable]
+
+[[library.immutable.license]]
+name = "MIT"
+url = "https://github.com/benbjohnson/immutable/blob/master/LICENSE"
+
+[library.golang_org_x_exp]
+
+[[library.golang_org_x_exp.license]]
+name = "BSD-3-Clause"
+url = "https://cs.opensource.google/go/x/exp/+/master:LICENSE"
+
+[library.ac-library-go]
+
+[[library.ac-library-go.license]]
+name = "CC0-1.0"
+url = "https://github.com/monkukui/ac-library-go/blob/master/LICENSE"

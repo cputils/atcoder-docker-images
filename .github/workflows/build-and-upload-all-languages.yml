@@ -1,0 +1,96 @@
+name: Build and upload all language images
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_selectors:
+        description: Comma- or newline-separated selectors to skip
+        required: false
+        type: string
+        default: ""
+      timeout_minutes:
+        description: Maximum minutes allowed for each build job
+        required: true
+        type: number
+        default: 15
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prepare_matrix:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v8.0.0
+
+      - name: Build matrix
+        id: matrix
+        env:
+          SKIP_SELECTORS: ${{ inputs.skip_selectors }}
+        run: |
+          uv run python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          from build import DEFAULT_INFO_DIR, load_targets, resolve_target
+
+          targets = load_targets(DEFAULT_INFO_DIR)
+          skip_selectors = [
+              item.strip()
+              for item in re.split(r"[,\n]+", os.environ.get("SKIP_SELECTORS", ""))
+              if item.strip()
+          ]
+
+          skipped_stems: set[str] = set()
+          for selector in skip_selectors:
+              skipped_stems.add(resolve_target(selector, targets).stem)
+
+          include = [
+              {"selector": target.stem}
+              for target in targets
+              if target.stem not in skipped_stems
+          ]
+
+          if not include:
+              raise SystemExit("No language images remain after applying skip_selectors.")
+
+          payload = json.dumps({"include": include})
+          Path(os.environ["GITHUB_OUTPUT"]).write_text(
+              f"matrix={payload}\n",
+              encoding="utf-8",
+          )
+          PY
+
+  build-and-upload:
+    needs: prepare_matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJSON(inputs.timeout_minutes) }}
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJson(needs.prepare_matrix.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v8.0.0
+
+      - name: Build image
+        run: uv run build.py "${{ matrix.selector }}"
+
+      - name: Upload to GHCR
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run upload.py "${{ matrix.selector }}"

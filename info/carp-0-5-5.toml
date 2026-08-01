@@ -1,0 +1,27 @@
+language = "Carp"
+display = "Carp(Carp 0.5.5)"
+filename = "Main.carp"
+object = "out/Untitled"
+compile = """
+export CARP_DIR=/opt/carp-v0.5.5-x86_64-linux
+carp -b --optimize Main.carp 1>&2
+"""
+execution = ["./out/Untitled"]
+install = """
+cd /tmp
+# apt update 追加
+sudo apt update -y
+sudo apt install -y unzip clang
+wget https://github.com/carp-lang/Carp/releases/download/v0.5.5/carp-v0.5.5-x86_64-linux.zip
+sudo unzip -d /opt carp-v0.5.5-x86_64-linux.zip
+sudo ln -s /opt/carp-v0.5.5-x86_64-linux/bin/carp /usr/local/bin/carp
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/carp-lang/Carp/blob/master/LICENSE"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/llvm/llvm-project/blob/main/clang/LICENSE.TXT"
+exception = "LLVM-exception"

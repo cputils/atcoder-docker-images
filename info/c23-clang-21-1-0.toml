@@ -1,0 +1,20 @@
+language = "C"
+display = "C23 (Clang 21.1.0)"
+filename = "Main.c"
+object = "a.out"
+compile = """
+clang -O2 -march=native -std=c23 -Wall -Wextra -DONLINE_JUDGE -DATCODER -o a.out Main.c -rtlib=compiler-rt -fuse-ld=lld -lm
+"""
+execution = ["./a.out"]
+install = """
+ATCODER_LLVM_VERSION=21.1.0
+cd /tmp
+wget -q -O llvm.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-${ATCODER_LLVM_VERSION}/LLVM-${ATCODER_LLVM_VERSION}-Linux-X64.tar.xz
+sudo tar -C /usr --strip-components=1 -xf llvm.tar.xz
+sudo ldconfig
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://raw.githubusercontent.com/llvm/llvm-project/main/llvm/LICENSE.TXT"
+exception = "LLVM-exception"

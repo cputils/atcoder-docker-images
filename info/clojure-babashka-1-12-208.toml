@@ -1,0 +1,17 @@
+language = "Clojure"
+display = "Clojure (babashka 1.12.208)"
+filename = "Main.clj"
+execution = [
+  "bb",
+  "Main.clj",
+]
+install = """
+cd /tmp
+curl -sLO https://raw.githubusercontent.com/babashka/babashka/master/install
+chmod +x install
+sudo ./install --version 1.12.208
+"""
+
+[[license]]
+name = "EPL-1.0"
+url = "https://github.com/babashka/babashka/blob/master/LICENSE"

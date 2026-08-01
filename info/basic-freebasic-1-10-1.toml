@@ -1,0 +1,34 @@
+language = "BASIC"
+display = "BASIC (FreeBASIC 1.10.1)"
+filename = "Main.bas"
+object = "Main"
+compile = """
+fbc -O 3 -arch native Main.bas 1>&2
+"""
+execution = ["./Main"]
+install = """
+FREEBASIC_VERSION=1.10.1
+sudo apt-get update
+sudo apt-get install -y libgpm-dev libxext-dev libxpm-dev libxrandr-dev libgl1-mesa-dev libffi-dev libncurses-dev libgmp-dev libgsl-dev libtre-dev libglib2.0-dev libpcre3-dev
+cd /tmp
+wget -O bootstrap.tar.xz https://github.com/freebasic/fbc/releases/download/${FREEBASIC_VERSION}/FreeBASIC-${FREEBASIC_VERSION}-source-bootstrap.tar.xz
+mkdir bootstrap
+tar --strip-components=1 -C bootstrap -xf bootstrap.tar.xz
+pushd bootstrap
+make -j$(nproc) bootstrap-minimal
+popd
+wget https://github.com/freebasic/fbc/archive/refs/tags/${FREEBASIC_VERSION}.tar.gz
+tar xf ${FREEBASIC_VERSION}.tar.gz
+pushd fbc-${FREEBASIC_VERSION}
+make -j$(nproc) 'FBC=/tmp/bootstrap/bin/fbc -i /tmp/bootstrap/inc'
+sudo make install
+popd
+"""
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://github.com/freebasic/fbc"
+
+[[license]]
+name = "!License-20"
+url = "https://github.com/freebasic/fbc"

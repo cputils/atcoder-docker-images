@@ -1,0 +1,20 @@
+language = "Lua"
+display = "Lua (LuaJIT 2.1.1703358377)"
+filename = "Main.lua"
+object = "luac.out"
+compile = """
+luajit -O3 -b Main.lua luac.out
+"""
+execution = [
+  "luajit",
+  "-O3",
+  "luac.out",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y luajit
+"""
+
+[[license]]
+name = "MIT"
+url = "https://www.opensource.org/licenses/mit-license.php"

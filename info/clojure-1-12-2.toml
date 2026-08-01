@@ -1,0 +1,68 @@
+language = "Clojure"
+display = "Clojure (clojure 1.12.2)"
+filename = "Main.clj"
+execution = [
+  "sh",
+  "clojure.sh",
+  "{memory:mb}",
+]
+install = """
+AC_CLOJURE_INATALLER_VERSION=1.12.2.1565
+AC_CLOJURE_VERSION=$(echo $AC_CLOJURE_INATALLER_VERSION | sed 's/\\.[0-9]\\+$//')
+
+sudo apt-get install -y openjdk-21-jre-headless
+pushd /tmp
+curl -L -O https://github.com/clojure/brew-install/releases/download/${AC_CLOJURE_INATALLER_VERSION}/linux-install.sh
+chmod +x linux-install.sh
+sudo ./linux-install.sh
+popd
+mkdir lib
+wget -q -O lib/ac_library.jar https://github.com/ocha98/ac-library-java/releases/download/v2.0.0/ac_library21.jar
+cat << EOF > deps.edn
+{:paths [\".\"]
+ :deps {org.clojure/clojure {:mvn/version \"$AC_CLOJURE_VERSION\"}}
+ :aliases
+ {:ac {:extra-paths [\"lib\"]
+        :extra-deps {local/ac_library {:local/root \"lib/ac_library.jar\"}}}}}
+EOF
+
+cat << 'EOF' > Main.clj
+(import 'ac_library.DSU)
+
+(let [dsu (DSU. 10)]
+  (println \"Hello, World!\")
+  (.merge dsu 3 4)
+  (println (.groups dsu)))
+EOF
+cat << 'EOF' > clojure.sh
+#!/bin/sh
+if [ \"$1\" -gt 1024 ]; then
+  stack_size=1024
+else
+  stack_size=\"$1\"
+fi
+heap_size=$(($1 * 90 / 100))
+
+clojure -J-Xss\"$stack_size\"M -J-Xmx\"$heap_size\"M -A:ac -M Main.clj
+EOF
+sh clojure.sh 2048
+"""
+
+[[license]]
+name = "EPL-1.0"
+url = "https://github.com/clojure/clojure/blob/master/readme.txt"
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/clojure/clojure/blob/master/readme.txt"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/clojure/clojure/blob/master/readme.txt"
+
+[library.ac-library-java]
+version = "v2.0.0"
+
+[[library.ac-library-java.license]]
+name = "CC0-1.0"
+url = "https://github.com/ocha98/ac-library-java/blob/main/LICENSE"

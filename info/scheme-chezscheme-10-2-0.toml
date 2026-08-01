@@ -1,0 +1,54 @@
+language = "Scheme"
+display = "Scheme (ChezScheme 10.2.0)"
+filename = "Main.scm"
+object = "Main.so"
+compile = """
+export CHEZSCHEMELIBDIRS=.:/usr/share/r6rs
+echo '(compile-file \"Main.scm\")' | scheme -q --optimize-level 3
+"""
+execution = [
+  "scheme",
+  "-q",
+  "--optimize-level",
+  "3",
+  "--script",
+  "Main.scm",
+]
+install = """
+CHEZ_VERSION=10.2.0
+cd /tmp
+wget -q https://github.com/cisco/ChezScheme/releases/download/v${CHEZ_VERSION}/csv${CHEZ_VERSION}.tar.gz
+tar xf csv${CHEZ_VERSION}.tar.gz
+cd csv${CHEZ_VERSION}
+./configure --disable-curses --disable-x11 --installprefix=/usr/local
+make -j$(nproc)
+sudo make install
+# install SRFI
+sudo apt-get update
+sudo apt-get install -y scheme-chez-srfi
+"""
+
+[environment]
+CHEZSCHEMELIBDIRS = ".:/usr/share/r6rs"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/cisco/ChezScheme/blob/main/LICENSE"
+
+[library.srfi]
+
+[[library.srfi.license]]
+name = "BSD-2-Clause"
+url = "https://changelogs.ubuntu.com/changelogs/pool/universe/c/chez-srfi/chez-srfi_0.0+git20201107.bac6f29+dfsg-2/copyright"
+
+[[library.srfi.license]]
+name = "BSD-3-Clause"
+url = "https://changelogs.ubuntu.com/changelogs/pool/universe/c/chez-srfi/chez-srfi_0.0+git20201107.bac6f29+dfsg-2/copyright"
+
+[[library.srfi.license]]
+name = "Unlicense"
+url = "https://changelogs.ubuntu.com/changelogs/pool/universe/c/chez-srfi/chez-srfi_0.0+git20201107.bac6f29+dfsg-2/copyright"
+
+[[library.srfi.license]]
+name = "!License-17"
+url = "https://changelogs.ubuntu.com/changelogs/pool/universe/c/chez-srfi/chez-srfi_0.0+git20201107.bac6f29+dfsg-2/copyright"

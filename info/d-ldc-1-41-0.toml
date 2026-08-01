@@ -1,0 +1,62 @@
+language = "D"
+display = "D (LDC 1.41.0)"
+filename = "source/app.d"
+object = "judge"
+compile = """
+dub build --skip-registry=all --nodeps --build=release-nobounds
+"""
+execution = ["./judge"]
+install = """
+sudo apt update
+sudo apt-get install -y --no-install-recommends curl build-essential ca-certificates libxml2
+
+D_COMPLILER=\"ldc-1.41.0\"
+
+wget https://dlang.org/install.sh -O /tmp/install.sh
+chmod +x /tmp/install.sh
+/tmp/install.sh install ${D_COMPLILER}
+
+sudo ln -s $(/tmp/install.sh get-path ${D_COMPLILER}) /usr/local/bin/ldc2
+sudo ln -s $(/tmp/install.sh get-path --dmd ${D_COMPLILER}) /usr/local/bin/ldmd2
+sudo ln -s $(/tmp/install.sh get-path --dub ${D_COMPLILER}) /usr/local/bin/dub
+
+dub init -n
+dub add mir@3.2.3
+dub build  --build=release-nobounds
+rm judge source/app.d
+"""
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[[license]]
+name = "BSL-1.0"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[[license]]
+name = "Artistic-1.0"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[[license]]
+name = "GPL-1.0-only"
+url = "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+
+[library.mir]
+version = "3.2.3"
+
+[[library.mir.license]]
+name = "BSL-1.0"
+url = "https://github.com/libmir/mir/blob/master/LICENSE.txt"

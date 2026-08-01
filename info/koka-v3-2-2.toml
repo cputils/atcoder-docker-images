@@ -1,0 +1,33 @@
+language = "Koka"
+display = "Koka (koka v3.2.2)"
+filename = "main.kk"
+object = "a.out"
+compile = """
+# --no-debug: デバッグのための情報を付けないようにする
+# -v0       : ログ出力を減らす (デフォルトは1)
+koka -O2 --no-debug -o a.out main.kk --buildtag=atcoder --no-buildhash -v0 1>&2
+if [ -f a.out ]; then chmod +x a.out; fi
+"""
+execution = ["./a.out"]
+install = """
+KOKA_VERSION=v3.2.2
+curl -sSL \"https://github.com/koka-lang/koka/releases/download/${KOKA_VERSION}/install.sh\" | sh
+
+# あらかじめ標準ライブラリ(現在は std/core のみ)をコンパイルしておくことでコンパイル時間を削減する
+cd /judge
+cat <<EOF >main.kk
+fun main()
+    \"Hello\".println
+EOF
+# .koka/ 以下のディレクトリ名を固定するために --buildtag と --no-buildhash を付ける
+koka -O2 --no-debug -o a.out main.kk --buildtag=atcoder --no-buildhash -v0
+# 不要なファイルを削除する
+pushd \".koka/${KOKA_VERSION}-atcoder/gcc-release\"
+rm main* a
+popd
+rm main.kk a.out
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/koka-lang/koka/blob/master/LICENSE"

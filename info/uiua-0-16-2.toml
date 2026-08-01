@@ -1,0 +1,30 @@
+language = "Uiua"
+display = "Uiua (uiua 0.16.2)"
+filename = "Main.ua"
+object = "Main.ua"
+compile = """
+./uiua check Main.ua > output
+result=$(tail -1 output)
+result=`echo $result`
+if [ \"$result\" = $'\\r'\"0/1 file compiled successfully\" ]; then
+    cat output >&2
+    rm Main.ua
+fi
+rm output
+"""
+execution = [
+  "./uiua",
+  "run",
+  "--no-format",
+  "--no-color",
+  "Main.ua",
+]
+install = """
+wget https://github.com/uiua-lang/uiua/releases/download/0.16.2/uiua-bin-x86_64-unknown-linux-gnu-no-audio.zip
+unzip uiua-bin-x86_64-unknown-linux-gnu-no-audio.zip
+rm uiua-bin-x86_64-unknown-linux-gnu-no-audio.zip
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/uiua-lang/uiua/blob/main/license"

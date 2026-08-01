@@ -1,0 +1,15 @@
+language = "C"
+display = "C23 (GCC 14.2.0)"
+filename = "Main.c"
+object = "a.out"
+compile = """
+gcc-14 -O2 -march=native -std=c23 -Wall -Wextra -DONLINE_JUDGE -DATCODER Main.c -lm
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get install -y gcc-14
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Copying.html"

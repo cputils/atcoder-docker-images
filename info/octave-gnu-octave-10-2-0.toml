@@ -1,0 +1,27 @@
+language = "Octave"
+display = "Octave (GNU Octave 10.2.0)"
+filename = "Main.m"
+execution = [
+  "octave",
+  "-W",
+  "Main.m",
+]
+install = """
+sudo apt update
+# https://wiki.octave.org/Octave_for_Debian_systems
+sudo apt install -y gcc g++ autoconf automake bison dvipng epstool fig2dev flex gfortran gnuplot-x11 gperf gzip icoutils libarpack2-dev libopenblas-dev libcurl4-gnutls-dev libfftw3-dev libfltk1.3-dev libfontconfig1-dev libfreetype-dev libgl1-mesa-dev libgl2ps-dev libglpk-dev libgraphicsmagick++1-dev libhdf5-dev liblapack-dev libosmesa6-dev libpcre2-dev libqhull-dev libqscintilla2-qt5-dev libqrupdate-dev libreadline-dev librsvg2-bin libsndfile1-dev libsuitesparse-dev libsundials-dev libtool libxft-dev make openjdk-11-jdk perl portaudio19-dev pstoedit qtbase5-dev qttools5-dev qttools5-dev-tools rapidjson-dev rsync tar texinfo texlive-latex-extra zlib1g-dev
+cd /tmp
+OCTAVE_VERSION=10.2.0
+wget https://ftpmirror.gnu.org/octave/octave-$OCTAVE_VERSION.tar.xz
+tar -xvf octave-$OCTAVE_VERSION.tar.xz
+cd octave-$OCTAVE_VERSION
+mkdir .build
+cd .build
+../configure
+make -j$(nproc)
+sudo make install
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://www.octave.org/copyright/"

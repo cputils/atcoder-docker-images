@@ -1,0 +1,27 @@
+language = "Factor"
+display = "Factor (Factor 0.100)"
+filename = "Main.factor"
+object = "Main.factor"
+compile = """
+# a workaround to avoid MLE
+# https://atcoder.jp/contests/language-test-202505/submissions/69450872
+/opt/factor/factor
+"""
+execution = [
+  "/opt/factor/factor",
+  "-datastack=102400",
+  "-retainstack=102400",
+  "-callstack=102400",
+  "-callbacks=102400",
+  "Main.factor",
+]
+install = """
+FACTOR_VERSION=0.100
+cd /tmp
+wget -nv http://downloads.factorcode.org/releases/${FACTOR_VERSION}/factor-linux-x86-64-${FACTOR_VERSION}.tar.gz
+sudo tar -C /opt -xzf factor-linux-x86-64-${FACTOR_VERSION}.tar.gz
+"""
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://github.com/factor/factor/blob/master/LICENSE.txt"

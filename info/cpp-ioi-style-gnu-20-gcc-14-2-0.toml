@@ -1,0 +1,15 @@
+language = "C++"
+display = "C++ IOI-Style(GNU++20) (GCC 14.2.0)"
+filename = "Main.cpp"
+object = "a.out"
+compile = """
+g++-14 -DEVAL -std=gnu++20 -O2 -pipe -static -s -o a.out Main.cpp
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get install -y g++-14
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/Copying.html"

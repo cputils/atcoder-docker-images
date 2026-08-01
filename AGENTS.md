@@ -1,0 +1,15 @@
+- Execute Python via uv. (e.g., `uv run example.py`)
+- Do not use pip; use uv to manage libraries instead.
+- Since the volume of data is large, always keep optimization and performance in mind during implementation.
+- Building Docker images takes a long time, so ensure you are confident in your code before proceeding.
+- In particular, the build time for some languages is very long, so avoid running it in those cases.
+- When editing a TOML file in the info directory, write the changes as markdown in the patches directory.
+- The patch notes should concisely state only the changes from the original AtCoder script and the reasons for those changes, and must not mention unrelated items such as user instructions or changes that have already been removed.
+- Write the patch notes so that they are understandable for first-time users.
+- If patch notes already exist, you must not erase all existing records, nor should you leave behind overwritten changes. You must check every item to confirm whether those changes remain in the current TOML file, delete any invalid items, and then append the new changes.
+- After the patch notes are updated, you must verify that all items are synchronized with the current TOML file specifications, and check the git diff to ensure that no valid changes have been accidentally deleted.
+- When making modifications, respect the original AtCoder installation script specifications as much as possible, and keep changes minimal and easy to understand.
+- Do not write any code in `build.py` that patches TOML files.
+- Do not include any fallback mechanisms.
+- Whatever language the user uses in their prompt, always use English for code comments and documentation.
+- Do not terminate the task until it is completely implemented.

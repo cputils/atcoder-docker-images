@@ -1,0 +1,33 @@
+language = "TeX"
+display = "TeX (tex 3.141592653)"
+filename = "Main.tex"
+execution = [
+  "sh",
+  "tex.sh",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y texlive-binaries
+cat << 'EOF' > tex.sh
+tex Main.tex | head -n -3 | sed -e '1d;2s@^(\\./Main.tex@@'
+EOF
+"""
+
+[environment]
+max_print_line = "2147483647"
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://changelogs.ubuntu.com/changelogs/pool/main/t/texlive-bin/texlive-bin_2023.20230311.66589-9build3/copyright"
+
+[[license]]
+name = "LPPL-1.3c"
+url = "https://changelogs.ubuntu.com/changelogs/pool/main/t/texlive-bin/texlive-bin_2023.20230311.66589-9build3/copyright"
+
+[[license]]
+name = "MIT"
+url = "https://changelogs.ubuntu.com/changelogs/pool/main/t/texlive-bin/texlive-bin_2023.20230311.66589-9build3/copyright"
+
+[[license]]
+name = "!License-16"
+url = "https://changelogs.ubuntu.com/changelogs/pool/main/t/texlive-bin/texlive-bin_2023.20230311.66589-9build3/copyright"

@@ -1,0 +1,46 @@
+language = "Java"
+display = "Java24 (OpenJDK 24.0.2)"
+filename = "Main.java"
+object = "Main.class"
+compile = """
+javac -cp ac_library.jar:bifurcan.jar Main.java
+"""
+execution = [
+  "sh",
+  "java.sh",
+  "{memory:mb}",
+]
+install = """
+curl https://download.java.net/java/GA/jdk24.0.2/fdc5d0102fe0414db21410ad5834341f/12/GPL/openjdk-24.0.2_linux-x64_bin.tar.gz | sudo tar zx -C /usr/local --strip-components=1
+wget -q -O ac_library.jar https://github.com/ocha98/ac-library-java/releases/download/v2.0.0/ac_library23.jar
+wget -q -O bifurcan.jar https://repo1.maven.org/maven2/io/lacuna/bifurcan/0.2.0-rc1/bifurcan-0.2.0-rc1.jar
+cat << 'EOF' > java.sh
+#! /bin/sh
+if [ \"$1\" -gt 1024 ]; then
+    stack_size=1024
+else
+    stack_size=\"$1\"
+fi
+heap_size=$(($1 * 90 / 100))
+java -Xmx\"$heap_size\"M -Xss\"$stack_size\"M -DONLINE_JUDGE=true -cp ac_library.jar:bifurcan.jar: Main
+EOF
+"""
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://openjdk.org/legal/gplv2+ce.html"
+exception = "Classpath-exception-2.0"
+
+[library.ac-library-java]
+version = "v2.0.0"
+
+[[library.ac-library-java.license]]
+name = "CC0-1.0"
+url = "https://github.com/ocha98/ac-library-java/blob/main/LICENSE"
+
+[library.bifurcan]
+version = "0.2.0-rc1"
+
+[[library.bifurcan.license]]
+name = "MIT"
+url = "https://mvnrepository.com/artifact/io.lacuna/bifurcan/0.2.0-rc1"

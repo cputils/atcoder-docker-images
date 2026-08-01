@@ -1,0 +1,20 @@
+language = "Befunge"
+display = "Befunge93 (TBC 1.0)"
+version = "v1.0"
+filename = "Main.bf"
+object = "a.out"
+compile = """
+tbc Main.bf > a.c
+cc -O2 -w a.c -o a.out
+"""
+execution = ["./a.out"]
+install = """
+cd /tmp
+curl -LR -O http://www.club.cc.cmu.edu/~ajo/funge/quadium.net/funge/tbc/tbc.c -o core.int http://www.club.cc.cmu.edu/~ajo/funge/quadium.net/funge/tbc/core.int
+sudo cc tbc.c -o /bin/tbc
+sudo mv core.int /judge/
+"""
+
+[[license]]
+name = "!License-24"
+url = "http://www.club.cc.cmu.edu/~ajo/funge/quadium.net/funge/tbc/tbc.c"

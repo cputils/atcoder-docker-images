@@ -1,0 +1,33 @@
+language = "Veryl"
+display = "Veryl (veryl 0.16.4)"
+filename = "main/src/main.veryl"
+object = "main/obj_dir/Vmain"
+compile = """
+export PATH=$HOME/bin:$PATH
+cd main
+veryl build --quiet && verilator -CFLAGS \"-O2 -march=native\" --binary -f main.f
+"""
+execution = ["./main/obj_dir/Vmain"]
+install = """
+AC_VERYL_VERSION=0.16.4
+sudo apt-get update
+sudo apt-get install -y verilator git
+pushd /tmp
+wget -q https://github.com/veryl-lang/verylup/releases/download/v0.1.7/verylup-x86_64-linux.zip
+mkdir $HOME/bin
+unzip verylup-x86_64-linux.zip -d $HOME/bin
+popd
+export PATH=$HOME/bin:$PATH
+verylup setup
+verylup install ${AC_VERYL_VERSION}
+verylup uninstall latest
+veryl new main
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/veryl-lang/veryl/blob/master/LICENSE-APACHE"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/veryl-lang/veryl/blob/master/LICENSE-MIT"

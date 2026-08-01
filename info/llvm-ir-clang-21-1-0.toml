@@ -1,0 +1,39 @@
+language = "LLVM IR"
+display = "LLVM IR (Clang 21.1.0)"
+filename = "Main.ll"
+object = "a.out"
+compile = """
+clang -O2 -march=native -o a.out Main.ll -fuse-ld=lld -lm
+"""
+execution = ["./a.out"]
+install = """
+ATCODER_LLVM_VERSION=21.1.0
+sudo apt-get update
+
+cd /tmp
+
+# `aria2c -x 16 -s 16` is a workdaround for `ERROR 618: jwt:expired`
+# see https://github.com/orgs/community/discussions/169381 for detail
+
+sudo apt-get install -y aria2
+
+if aria2c -x 16 -s 16 --show-console-readout false --summary-interval 0 --console-log-level=error -o llvm.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-${ATCODER_LLVM_VERSION}/LLVM-${ATCODER_LLVM_VERSION}-Linux-X64.tar.xz; then
+  sudo tar -C /usr --strip-components=1 -xf llvm.tar.xz
+else
+  sudo apt-get install -y cmake binutils-dev
+
+  wget -nv -O llvm-src.tar.xz https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${ATCODER_LLVM_VERSION}.tar.gz
+  mkdir llvm-src
+  tar -C llvm-src --strip-components=1 -xf llvm-src.tar.xz
+  cd llvm-src
+  cmake -S llvm -B build -DLLVM_ENABLE_PROJECTS=\"clang;lld\" -DCMAKE_BUILD_TYPE=Release -DLLVM_PARALLEL_COMPILE_JOBS=$(nproc) -DLLVM_PARALLEL_LINK_JOBS=$(nproc) -DLLVM_PARALLEL_TABLEGEN_JOBS=$(nproc) -DLLVM_TARGETS_TO_BUILD=host
+  cmake --build build -j$(nproc)
+  sudo cmake --build build --target install
+fi
+sudo ldconfig
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://raw.githubusercontent.com/llvm/llvm-project/main/llvm/LICENSE.TXT"
+exception = "LLVM-exception"

@@ -1,0 +1,73 @@
+language = "Clojure"
+display = "Clojure (Clojure AOT 1.12.2)"
+filename = "main/src/main/core.clj"
+object = "main/target/uberjar/main-0.1.0-SNAPSHOT-standalone.jar"
+compile = """
+cd main
+lein uberjar > /tmp/lein.log
+if grep -q -E '^Warning: The Main-Class specified does not exist within the jar' /tmp/lein.log; then
+  rm target/uberjar/main-0.1.0-SNAPSHOT-standalone.jar
+  grep -E '^Warning:' /tmp/lein.log | sed 's/^Warning:/Error:/' 1>&2
+fi
+"""
+execution = [
+  "sh",
+  "clojure-aot.sh",
+  "{memory:mb}",
+]
+install = """
+sudo apt-get update
+sudo apt-get install -y build-essential zlib1g-dev leiningen
+
+lein new app main
+pushd main
+mkdir lib
+wget -O lib/ac_library.jar https://github.com/ocha98/ac-library-java/releases/download/v2.0.0/ac_library21.jar
+sed -i -e 's@:dependencies \\[.*@:dependencies \\[\\[org.clojure/clojure \"1.12.2\"\\]\\]\\n  :resource-paths \\[\"lib/ac_library.jar\"\\]@' project.clj
+cat << 'EOF' > src/main/core.clj
+(ns main.core
+  (:import [ac_library DSU])
+  (:gen-class))
+
+(defn -main
+  [& args]
+  (let [dsu (DSU. 10)]
+    (println \"Hello, World!\")
+    (.merge dsu 3 4)
+    (println (.groups dsu))))
+EOF
+lein do clean, uberjar
+lein clean
+popd
+cat << 'EOF' > clojure-aot.sh
+#!/bin/sh
+if [ \"$1\" -gt 1024 ]; then
+  stack_size=1024
+else
+  stack_size=\"$1\"
+fi
+
+heap_size=$(($1 * 90 / 100))
+
+java -Xmx\"$heap_size\"M -Xss\"$stack_size\"M -cp main/lib/ac_library.jar:main/target/uberjar/main-0.1.0-SNAPSHOT-standalone.jar main.core
+EOF
+"""
+
+[[license]]
+name = "EPL-1.0"
+url = "https://github.com/clojure/clojure/blob/master/readme.txt"
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/clojure/clojure/blob/master/readme.txt"
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/clojure/clojure/blob/master/readme.txt"
+
+[library.ac-library-java]
+version = "v2.0.0"
+
+[[library.ac-library-java.license]]
+name = "CC0-1.0"
+url = "https://github.com/ocha98/ac-library-java/blob/main/LICENSE"

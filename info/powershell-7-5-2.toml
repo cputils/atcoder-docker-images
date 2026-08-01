@@ -1,0 +1,36 @@
+language = "PowerShell"
+display = "PowerShell (PowerShell 7.5.2)"
+filename = "Main.ps1"
+execution = [
+  "pwsh",
+  "./Main.ps1",
+]
+install = """
+cd /tmp
+
+sudo apt install -y unzip
+wget https://github.com/kzrnm/ac-library-csharp/releases/download/v3.9.2-atcoder1/ac-library-csharp.3.9.2-atcoder1.nupkg
+unzip ac-library-csharp.3.9.2-atcoder1.nupkg
+mv lib/net9.0/ac-library-csharp.dll /judge/
+
+mkdir $HOME/.powershell
+wget https://github.com/PowerShell/PowerShell/releases/download/v7.5.2/powershell-7.5.2-linux-x64.tar.gz
+tar xvzf powershell-7.5.2-linux-x64.tar.gz -C $HOME/.powershell
+
+sudo ln -s $HOME/.powershell/pwsh /usr/local/bin/pwsh
+chmod +x /usr/local/bin/pwsh
+"""
+
+[environment]
+DOTNET_EnableWriteXorExecute = "0"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/PowerShell/PowerShell/blob/master/LICENSE.txt"
+
+[library.ac-library-csharp]
+version = "3.9.2-atcoder1"
+
+[[library.ac-library-csharp.license]]
+name = "CC0-1.0"
+url = "https://github.com/kzrnm/ac-library-csharp/blob/main/Source/ac-library-csharp/LICENSE"

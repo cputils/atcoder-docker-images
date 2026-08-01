@@ -1,0 +1,138 @@
+language = "ISLisp"
+display = "ISLisp (Easy-ISLisp 5.43)"
+filename = "main.lsp"
+object = "main.o"
+compile = """
+(echo '(compile-file \"main.lsp\")' | eisl -cr) > output
+if [ ! -f main.o ]; then
+    cat output >&2
+fi
+rm output
+"""
+execution = [
+  "eisl",
+  "-s",
+  "main.o",
+]
+install = """
+# コンパイルに必要なパッケージのインストール
+sudo apt-get update
+sudo apt-get install -y git libncurses-dev
+
+# tmpにソースコードをクローン
+cd /tmp
+git clone https://github.com/sasagawa888/eisl
+cd eisl
+git checkout v5.43
+
+# コンパイル
+sudo make all
+
+# eislのインストール
+sudo install -m 755 eisl /usr/local/bin
+
+# ライブラリ用ディレクトリの作成
+sudo mkdir -p -m 755 /usr/local/share/eisl
+sudo mkdir -p -m 755 /usr/local/share/eisl/library
+
+# コンパイラのインストール
+sudo install -m 644 library/compiler.lsp /usr/local/share/eisl/library
+sudo install -m 644 fast.h ffi.h /usr/local/share/eisl
+
+# sasagawa888氏により開発されたその他のライブラリのインストール
+sudo install -m 644 library/bit.o /usr/local/share/eisl/library
+sudo install -m 644 library/string.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/elixir.lsp /usr/local/share/eisl/library
+
+# Makoto Hiroi氏により開発されたライブラリのインストール
+sudo install -m 644 library/hash.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/queue.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/seq.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/list.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/cxr.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/lazy.lsp /usr/local/share/eisl/library
+sudo install -m 644 library/macro.lsp /usr/local/share/eisl/library
+
+# Makoto Hiroi氏により開発されたMITライセンスのライブラリのインストール
+sudo install -m 644 library/rational.lsp /usr/local/share/eisl/library
+
+# gitとlibncurses-devのpurge
+sudo apt-get purge -y git libncurses-dev
+"""
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.compiler]
+version = "5.00"
+
+[[library.compiler.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.bit]
+
+[[library.bit.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.string]
+
+[[library.string.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.elixir]
+
+[[library.elixir.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.hash]
+
+[[library.hash.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.queue]
+
+[[library.queue.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.seq]
+
+[[library.seq.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.list]
+
+[[library.list.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.cxr]
+
+[[library.cxr.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.lazy]
+
+[[library.lazy.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.macro]
+
+[[library.macro.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/license.txt"
+
+[library.rational]
+
+[[library.rational.license]]
+name = "MIT"
+url = "https://github.com/sasagawa888/eisl/blob/v5.43/library/rational.lsp"

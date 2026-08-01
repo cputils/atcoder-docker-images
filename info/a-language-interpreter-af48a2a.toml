@@ -1,0 +1,19 @@
+language = "A言語"
+display = "A言語 (interpreter af48a2a)"
+filename = "Main.a"
+execution = [
+  "interpreter",
+  "Main.a",
+]
+install = """
+cd /tmp
+curl -L -o a.zip https://github.com/snuke/a/archive/af48a2a058d625f9a12f4695a31d0d3fede6d517.zip
+unzip a.zip
+cd a-af48a2a058d625f9a12f4695a31d0d3fede6d517
+make
+sudo cp interpreter /usr/local/bin/
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/snuke/a/blob/af48a2a058d625f9a12f4695a31d0d3fede6d517/LICENSE"

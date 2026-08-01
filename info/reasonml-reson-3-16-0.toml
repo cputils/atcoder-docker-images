@@ -1,0 +1,35 @@
+language = "ReasonML"
+display = "ReasonML (reson 3.16.0)"
+version = "3.16.0"
+filename = "main/bin/main.re"
+object = "main/_build/default/bin/main.exe"
+compile = """
+cd main
+eval $(opam env)
+dune build --release
+"""
+execution = ["./main/_build/default/bin/main.exe"]
+install = """
+sudo apt update
+sudo apt install -y opam
+opam init -y
+opam update
+opam upgrade
+eval $(opam env)
+opam switch create . 5.3.0 --deps-only
+eval $(opam env --switch=.)
+opam install -y reason.3.16.0
+opam install dune
+dune init project main
+cd main
+rm bin/main.ml
+cat > dune << 'EOF'
+(env
+ (release
+  (ocamlopt_flags (:standard -O2))))
+EOF
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/reasonml/reason/blob/master/LICENSE.txt"

@@ -1,0 +1,400 @@
+language = "Fix"
+display = "Fix (1.1.0-alpha.12)"
+filename = "main.fix"
+object = "a.out"
+compile = """
+fix build -O max
+"""
+execution = ["./a.out"]
+install = """
+AC2025_FIX_VERSION=v1.1.0-alpha.12
+sudo apt-get update
+sudo apt-get install -y libgmp-dev
+
+pushd /tmp
+wget -q -O fix https://github.com/tttmmmyyyy/fixlang/releases/download/${AC2025_FIX_VERSION}/fix-${AC2025_FIX_VERSION}-x86_64-unknown-linux-gnu
+sudo install fix /usr/local/bin/fix
+popd
+
+fix init
+fix deps add \\
+character@=1.0.1 \\
+hash@=1.1.0 \\
+hashmap@=1.1.3 \\
+hashset@=1.1.1 \\
+math@=1.2.0 \\
+random@=1.1.1 \\
+regexp@=1.1.1 \\
+time@=1.0.2 \\
+binary-heap@=0.1.2 \\
+bool-array@=0.1.1 \\
+cp-library@=0.6.6 \\
+ring-buffer@=0.1.1 \\
+gmp-fix@=0.6.0 \\
+minilib-common@=0.6.1 \\
+minilib-text@=0.5.2 \\
+minilib-binary@=0.5.1 \\
+minilib-collection@=0.6.0 \\
+minilib-monad@=0.6.0 \\
+minilib-comonad@=0.5.1 \\
+minilib-random@=0.5.2 \\
+minilib-math@=0.6.1 \\
+minilib-crypto@=0.5.1 \\
+minilib-app@=0.5.1 \\
+minilib-json@=0.5.1 \\
+minilib-xml@=0.5.1 \\
+
+cat << 'EOF' > main.fix
+module Main;
+
+import CPLib.IO;
+import CPLib.ZP;
+import CPLib.Arithmetic;
+import CPLib.Segtree;
+import CPLib.DSegtree;
+import CPLib.LSegtree;
+import CPLib.LDSegtree;
+import CPLib.Trait;
+import CPLib.UnionFind;
+import CPLib.Graph;
+import CPLib.MaxFlow;
+import CPLib.MinCostFlow;
+import CPLib.Bipartite;
+import CPLib.String;
+import CPLib.TwoSat;
+import CPLib.Convolution;
+
+main : IO ();
+main = (
+    // To generate type check cache, use many functions
+    if false {
+        // IO
+        let _ = CPLib.IO::read_i;
+        let _ = CPLib.IO::read_u;
+        let _ = CPLib.IO::read_f;
+        let _ = CPLib.IO::read_s;
+        let _ = CPLib.IO::read_is;
+        let _ = CPLib.IO::read_us;
+        let _ = CPLib.IO::read_fs;
+        let _ = CPLib.IO::read_ss;
+
+        // ZP
+        let x = ZP::make(42) : ZP P1000000007;
+        let x = x.power(42);
+        let x = x.inv;
+        let x = x + x;
+        let x = x - x;
+        let x = x * x;
+        let x = x / x;
+        let x = -x;
+        // fft is referenced by convolution
+
+        // Arithmetic
+        let _ = x.to_string;
+        let _ = 42.pmod(42);
+        let _ = calc_gcd(42, 42);
+        let _ = ext_gcd(42, 42);
+        let _ = pow_mod(42, 42, 42);
+        let _ = inv_mod(42, 42);
+        let _ = create_prime_list;
+        let _ = is_prime;
+        let _ = is_prime_32;
+        let _ = lift_crt;
+
+        // Segtree
+        let _ = Segtree::init(42) : Segtree I64Max;
+        let tree = Segtree::build([]) : Segtree I64Max;
+        let _ = tree.@(0);
+        let _ = tree.set(0, I64Max::make(42));
+        let _ = tree.fold(0, 0);
+
+        // DSegtree
+        let _ = DSegtree::init(42, 0, |(lhs, rhs)| lhs + rhs);
+        let d_tree = DSegtree::build([], 0, |(lhs, rhs)| lhs + rhs);
+        let _ = d_tree.@(0);
+        let _ = d_tree.set(0, 42);
+        let _ = d_tree.fold(0, 0);
+
+        // LSegtree
+        let _ = LSegtree::init(42) : LSegtree I64Max I64Add;
+        let tree = LSegtree::build([]) : LSegtree I64Max I64Add;
+        let tree = tree.set(0, I64Max::make(42));
+        let (tree, _) = tree.fold(0, 0);
+        let tree = tree.act_range(0, 0, I64Add::make(42));
+
+        // LDSegtree
+        let _ = LDSegtree::init(42, 0, |(lhs, rhs)| max(lhs, rhs), 0, |(lhs, rhs)| lhs + rhs);
+        let tree = LDSegtree::build([], 0, |(lhs, rhs)| max(lhs, rhs), 0, |(lhs, rhs)| lhs + rhs, |(m, a)| m + a);
+        let tree = tree.set(0, 42);
+        let (tree, _) = tree.fold(0, 0);
+        let tree = tree.act_range(0, 0, 42);
+
+        // UnionFind
+        let uf = UnionFind::create(42);
+        let uf = uf.unite(0, 1);
+        let (uf, _) = uf.is_united(0, 1);
+        let (uf, _) = uf.get_groups;
+
+        // Graph
+        let g = Graph::create(42) : Graph I64;
+        let g = g.add_edge(0, 1, 42);
+        let _ = g.dijkstra(0);
+        // scc is referenced by twosat.
+
+        // MaxFlow
+        let mf = MaxFlowGraph::create(42, 0, 1);
+        let (mf, e) = mf.add_edge_id(0, 1, 42);
+        let (mf, _) = mf.maximize_flow;
+        let _ = mf.get_flow(e);
+        let _ = mf.get_min_cut;
+
+        // MinCostFlow
+        let mf = MinCostFlowGraph::create(42, 0, 1);
+        let (mf, e) = mf.add_edge_id(0, 1, 42, 42);
+        let (mf, flow, cost) = mf.maximize_flow_min_cost(42);
+        let _ = mf.get_flow(e);
+
+        // Bipartite
+        let bp = BipartiteGraph::create(42, 42);
+        let bp = bp.BipartiteGraph::add_edge(0, 1);
+        let bg = bp.maximize_flow;
+        let _ = bg.get_max_matching;
+        let _ = bg.get_min_vertex_cover;
+        let _ = bg.get_max_indep_set;
+        let _ = bg.get_min_edge_cover;
+
+        // String
+        let s = \"abracadabra\";
+        let sa = calc_suffix_array(s);
+        let lcp = calc_lcp_array(sa, s);
+        let z = calc_z_array(s);
+
+        // TwoSat
+        let ts = TwoSat::create(42);
+        let ts = ts.add_clause(0, true, 1, false);
+        let _ = ts.solve;
+
+        // Convolution
+        let _ = convolve_zp([], []) : Array (ZP P1000000007);
+        let _ = convolve_i64([], []);
+
+        pure()
+    } else {
+        println(\"Hello, Fix!\")
+    }
+);
+
+// Maximum Monoid
+type I64Max = struct { v : I64 };
+namespace I64Max {
+    make : I64 -> I64Max;
+    make = |v| I64Max { v : v };
+}
+impl I64Max : Monoid {
+    unit = make(I64::minimum);
+    op = |lhs, rhs| make $ lhs.@v.max(rhs.@v);
+}
+
+// Addition Monoid
+type I64Add = struct { v : I64 };
+namespace I64Add {
+    make : I64 -> I64Add;
+    make = |v| I64Add { v : v };
+}
+impl I64Add : Monoid {
+    unit = make(0);
+    op = |lhs, rhs| make $ lhs.@v + rhs.@v;
+}
+
+// Action of Addition Monoid on Maximum Monoid
+impl I64Add : Action {
+    type Set I64Add = I64Max; // Type of the set acted upon
+    act = |a, x| I64Max::make(x.@v + a.@v);
+}
+
+EOF
+
+fix build -O none # no need to optimization to generate type check cache
+./a.out
+rm a.out
+rm -rf .fixlang/intermediate # remove object files
+"""
+
+[[license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang/blob/main/LICENSE"
+
+[library.character]
+version = "1.0.1"
+
+[[library.character.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-character/blob/main/LICENSE"
+
+[library.hash]
+version = "1.1.0"
+
+[[library.hash.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-hash/blob/main/LICENSE"
+
+[library.hashmap]
+version = "1.1.3"
+
+[[library.hashmap.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-hashmap/blob/main/LICENSE"
+
+[library.hashset]
+version = "1.1.1"
+
+[[library.hashset.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-hashset/blob/main/LICENSE"
+
+[library.math]
+version = "1.2.0"
+
+[[library.math.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-math/blob/main/LICENSE"
+
+[library.random]
+version = "1.1.1"
+
+[[library.random.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-random/blob/main/LICENSE"
+
+[library.regexp]
+version = "1.1.1"
+
+[[library.regexp.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-regexp/blob/main/LICENSE"
+
+[library.time]
+version = "1.0.2"
+
+[[library.time.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-time/blob/main/LICENSE"
+
+[library.binary-heap]
+version = "0.1.2"
+
+[[library.binary-heap.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-binary-heap/blob/main/LICENSE"
+
+[library.bool-array]
+version = "0.1.1"
+
+[[library.bool-array.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/bool-array/blob/main/LICENSE"
+
+[library.cp-library]
+version = "0.6.6"
+
+[[library.cp-library.license]]
+name = "CC0-1.0"
+url = "https://github.com/tttmmmyyyy/cp-library/blob/main/LICENSE"
+
+[library.ring-buffer]
+version = "0.1.1"
+
+[[library.ring-buffer.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/ring-buffer/blob/main/LICENSE"
+
+[library.gmp-fix]
+version = "0.6.0"
+
+[[library.gmp-fix.license]]
+name = "MIT"
+url = "https://github.com/tttmmmyyyy/fixlang-gmp/blob/main/LICENSE"
+
+[library.minilib-common]
+version = "0.6.1"
+
+[[library.minilib-common.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-common/blob/main/LICENSE"
+
+[library.minilib-text]
+version = "0.5.2"
+
+[[library.minilib-text.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-text/blob/main/LICENSE"
+
+[library.minilib-binary]
+version = "0.5.1"
+
+[[library.minilib-binary.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-binary/blob/main/LICENSE"
+
+[library.minilib-collection]
+version = "0.6.0"
+
+[[library.minilib-collection.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-collection/blob/main/LICENSE"
+
+[library.minilib-monad]
+version = "0.6.0"
+
+[[library.minilib-monad.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-monad/blob/main/LICENSE"
+
+[library.minilib-comonad]
+version = "0.5.1"
+
+[[library.minilib-comonad.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-comonad/blob/main/LICENSE"
+
+[library.minilib-random]
+version = "0.5.2"
+
+[[library.minilib-random.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-random/blob/main/LICENSE"
+
+[library.minilib-math]
+version = "0.6.1"
+
+[[library.minilib-math.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-math/blob/main/LICENSE"
+
+[library.minilib-crypto]
+version = "0.5.1"
+
+[[library.minilib-crypto.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-crypto/blob/main/LICENSE"
+
+[library.minilib-app]
+version = "0.5.1"
+
+[[library.minilib-app.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-app/blob/main/LICENSE"
+
+[library.minilib-json]
+version = "0.5.1"
+
+[[library.minilib-json.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-json/blob/main/LICENSE"
+
+[library.minilib-xml]
+version = "0.5.1"
+
+[[library.minilib-xml.license]]
+name = "MIT"
+url = "https://github.com/pt9999/fixlang-minilib-xml/blob/main/LICENSE"

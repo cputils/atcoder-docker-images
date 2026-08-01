@@ -1,0 +1,17 @@
+language = "Scheme"
+display = "Scheme (Gauche 0.9.15)"
+filename = "Main.scm"
+execution = [
+  "gosh",
+  "./Main.scm",
+]
+install = """
+sudo apt-get install build-essential libgdbm-dev zlib1g-dev texinfo -y
+curl https://raw.githubusercontent.com/shirok/get-gauche/master/get-gauche.sh -o /tmp/get-gauche.sh
+cd /tmp
+bash get-gauche.sh --auto --skip-tests --prefix /usr/local --sudo --version 0.9.15
+"""
+
+[[license]]
+name = "BSD-3-Clause"
+url = "https://github.com/shirok/Gauche/blob/master/COPYING"

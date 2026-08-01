@@ -1,0 +1,14 @@
+language = "Text"
+display = "Text (cat 9.4)"
+filename = "Main.text"
+execution = [
+  "cat",
+  "Main.text",
+]
+install = """
+# No action is required as it is installed by default.
+"""
+
+[[license]]
+name = "GPL-3.0-only"
+url = "https://git.savannah.gnu.org/gitweb/?p=coreutils.git;a=blob;f=COPYING"

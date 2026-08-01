@@ -1,0 +1,22 @@
+language = "Kuin"
+display = "Kuin (kuincl v.2021.8.17)"
+filename = "main.kn"
+object = "a.out"
+compile = """
+./kuin/kuincl -i main.kn -o main.cpp -s kuin/sys/ -e cpp -r -q 1>&2 && g++ -O2 -o a.out main.cpp
+"""
+execution = ["./a.out"]
+install = """
+KUIN_SRC_NAME=kuin_2021_08_17_src_ja
+wget -O ${KUIN_SRC_NAME}.zip https://web.archive.org/web/20221128115333/https://kuina.ch/download/${KUIN_SRC_NAME}.zip
+unzip ${KUIN_SRC_NAME}.zip
+rm ${KUIN_SRC_NAME}.zip
+mv ${KUIN_SRC_NAME} kuin
+cd kuin
+g++ -o kuincl kuin.cpp
+rm -fr sys/{web,exe}
+"""
+
+[[license]]
+name = "!License-13"
+url = "https://kuina.ch/others/license"

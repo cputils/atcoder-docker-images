@@ -1,0 +1,28 @@
+language = "Seed7"
+display = "Seed7 (Seed7 3.5.0)"
+filename = "Main.sd7"
+object = "Main"
+compile = """
+s7c -O2 -oc3 Main.sd7
+"""
+execution = ["./Main"]
+install = """
+sudo apt-get install -y libx11-dev
+cd /tmp
+SEED7_RELEASE=05_20250729
+wget -q -O seed7_$SEED7_RELEASE.tgz https://downloads.sourceforge.net/project/seed7/seed7/seed7_$SEED7_RELEASE/seed7_$SEED7_RELEASE.tgz
+tar -C \"$HOME\" -xf seed7_$SEED7_RELEASE.tgz
+cd \"$HOME\"/seed7/src
+make depend
+make -j $(nproc)
+make -j $(nproc) s7c
+sudo make install
+"""
+
+[[license]]
+name = "GPL-2.0-only"
+url = "https://github.com/ThomasMertes/seed7/blob/master/COPYING"
+
+[[license]]
+name = "LGPL-2.1-only"
+url = "https://github.com/ThomasMertes/seed7/blob/master/LGPL"

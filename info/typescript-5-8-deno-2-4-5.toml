@@ -1,0 +1,576 @@
+language = "TypeScript"
+display = "TypeScript 5.8 (Deno 2.4.5)"
+filename = "Main.ts"
+object = "ok"
+compile = """
+export NO_COLOR=1
+export DENO_NO_UPDATE_CHECK=1
+export PATH=$PATH:$HOME/.deno/bin
+
+deno check --quiet Main.ts && touch ok
+"""
+execution = [
+  "sh",
+  "deno.sh",
+  "{memory:kb}",
+]
+install = """
+# Install Deno
+sudo apt-get update
+sudo apt-get install -y unzip
+curl -fsSL https://deno.land/install.sh | sh -s v2.4.5 -y
+
+# Set environment variables
+export NO_COLOR=1
+export DENO_NO_UPDATE_CHECK=1
+export PATH=$PATH:$HOME/.deno/bin
+
+# Setup a project
+cat > deno.json << 'EOF'
+{
+  \"imports\": {
+  }
+}
+EOF
+
+# Add packages
+deno add \\
+jsr:@std/assert@1.0.14 \\
+jsr:@std/async@1.0.14 \\
+jsr:@std/bytes@1.0.6 \\
+jsr:@std/cache@0.2.0 \\
+jsr:@std/cbor@0.1.8 \\
+jsr:@std/cli@1.0.22 \\
+jsr:@std/collections@1.1.3 \\
+jsr:@std/crypto@1.0.5 \\
+jsr:@std/csv@1.0.6 \\
+jsr:@std/data-structures@1.0.9 \\
+jsr:@std/datetime@0.225.5 \\
+jsr:@std/dotenv@0.225.5 \\
+jsr:@std/encoding@1.0.10 \\
+jsr:@std/expect@1.0.17 \\
+jsr:@std/fmt@1.0.8 \\
+jsr:@std/front-matter@1.0.9 \\
+jsr:@std/fs@1.0.19 \\
+jsr:@std/html@1.0.4 \\
+jsr:@std/http@1.0.20 \\
+jsr:@std/ini@0.225.2 \\
+jsr:@std/internal@1.0.10 \\
+jsr:@std/io@0.225.2 \\
+jsr:@std/json@1.0.2 \\
+jsr:@std/jsonc@1.0.2 \\
+jsr:@std/log@0.224.14 \\
+jsr:@std/media-types@1.1.0 \\
+jsr:@std/msgpack@1.0.3 \\
+jsr:@std/net@1.0.6 \\
+jsr:@std/path@1.1.2 \\
+jsr:@std/random@0.1.2 \\
+jsr:@std/regexp@1.0.1 \\
+jsr:@std/semver@1.0.5 \\
+jsr:@std/streams@1.0.12 \\
+jsr:@std/tar@0.1.8 \\
+jsr:@std/testing@1.0.15 \\
+jsr:@std/text@1.0.16 \\
+jsr:@std/toml@1.0.10 \\
+jsr:@std/ulid@1.0.0 \\
+jsr:@std/uuid@1.0.9 \\
+jsr:@std/webgpu@0.224.8 \\
+jsr:@std/yaml@1.0.9 \\
+npm:@types/lodash@4.17.20 \\
+npm:ac-library-js@0.1.1 \\
+npm:data-structure-typed@2.0.4 \\
+npm:immutable@5.1.3 \\
+npm:lodash@4.17.21 \\
+npm:mathjs@14.7.0 \\
+npm:tstl@3.0.0 \\
+
+cat << 'EOF' > deno.sh
+#!/bin/sh
+if [ \"$1\" -gt 1048576 ]; then
+  stack_size=1048576
+else
+  stack_size=\"$1\"
+fi
+
+deno \\
+run \\
+--allow-all \\
+--quiet \\
+--no-prompt \\
+--v8-flags=--stack-size=\"$stack_size\" \\
+Main.ts \\
+ONLINE_JUDGE \\
+ATCODER
+EOF
+
+cat > Main.ts << 'EOF'
+/// <reference types=\"npm:@types/node\" />
+import * as math from \"mathjs\";
+import { sortBy } from \"@std/collections/sort-by\";
+import { DSU } from \"ac-library-js/dsu\";
+
+console.log(math.sqrt(16));
+
+const a = [3, 1, 2];
+const sorted_a = sortBy(a, (x) => x);
+console.log(sorted_a);
+
+const uf = new DSU(10);
+uf.merge(1, 2);
+uf.merge(4, 2);
+console.log(uf.same(1, 4));
+console.log(uf);
+EOF
+
+deno check --quiet Main.ts && sh deno.sh 2097152
+"""
+
+[environment]
+NO_COLOR = "1"
+DENO_NO_UPDATE_CHECK = "1"
+PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.deno/bin"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/denoland/deno/blob/main/LICENSE.md"
+
+[library."@std/assert"]
+version = "1.0.14"
+
+[[library."@std/assert".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/async"]
+version = "1.0.14"
+
+[[library."@std/async".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/bytes"]
+version = "1.0.6"
+
+[[library."@std/bytes".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/cache"]
+version = "0.2.0"
+
+[[library."@std/cache".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/cbor"]
+version = "0.1.8"
+
+[[library."@std/cbor".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/cli"]
+version = "1.0.22"
+
+[[library."@std/cli".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/collections"]
+version = "1.1.3"
+
+[[library."@std/collections".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/crypto"]
+version = "1.0.5"
+
+[[library."@std/crypto".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/csv"]
+version = "1.0.6"
+
+[[library."@std/csv".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/data-structures"]
+version = "1.0.9"
+
+[[library."@std/data-structures".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/datetime"]
+version = "0.225.5"
+
+[[library."@std/datetime".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/dotenv"]
+version = "0.225.5"
+
+[[library."@std/dotenv".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/encoding"]
+version = "1.0.10"
+
+[[library."@std/encoding".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/expect"]
+version = "1.0.17"
+
+[[library."@std/expect".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/fmt"]
+version = "1.0.8"
+
+[[library."@std/fmt".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/front-matter"]
+version = "1.0.9"
+
+[[library."@std/front-matter".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/fs"]
+version = "1.0.19"
+
+[[library."@std/fs".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/html"]
+version = "1.0.4"
+
+[[library."@std/html".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/http"]
+version = "1.0.20"
+
+[[library."@std/http".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/ini"]
+version = "0.225.2"
+
+[[library."@std/ini".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/internal"]
+version = "1.0.10"
+
+[[library."@std/internal".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/io"]
+version = "0.225.2"
+
+[[library."@std/io".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/json"]
+version = "1.0.2"
+
+[[library."@std/json".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/jsonc"]
+version = "1.0.2"
+
+[[library."@std/jsonc".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/log"]
+version = "0.224.14"
+
+[[library."@std/log".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/media-types"]
+version = "1.1.0"
+
+[[library."@std/media-types".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/msgpack"]
+version = "1.0.3"
+
+[[library."@std/msgpack".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/net"]
+version = "1.0.6"
+
+[[library."@std/net".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/path"]
+version = "1.1.2"
+
+[[library."@std/path".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/random"]
+version = "0.1.2"
+
+[[library."@std/random".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/regexp"]
+version = "1.0.1"
+
+[[library."@std/regexp".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/semver"]
+version = "1.0.5"
+
+[[library."@std/semver".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/streams"]
+version = "1.0.12"
+
+[[library."@std/streams".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/tar"]
+version = "0.1.8"
+
+[[library."@std/tar".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/testing"]
+version = "1.0.15"
+
+[[library."@std/testing".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/text"]
+version = "1.0.16"
+
+[[library."@std/text".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/toml"]
+version = "1.0.10"
+
+[[library."@std/toml".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/ulid"]
+version = "1.0.0"
+
+[[library."@std/ulid".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/uuid"]
+version = "1.0.9"
+
+[[library."@std/uuid".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/webgpu"]
+version = "0.224.8"
+
+[[library."@std/webgpu".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@std/yaml"]
+version = "1.0.9"
+
+[[library."@std/yaml".license]]
+name = "MIT"
+url = "https://github.com/denoland/std/blob/main/LICENSE"
+
+[library."@types/lodash"]
+version = "4.17.20"
+
+[[library."@types/lodash".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@types/lodash"
+
+[library."@types/node"]
+version = "24.2.0"
+
+[[library."@types/node".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@types/node"
+
+[library.ac-library-js]
+version = "0.1.1"
+
+[[library.ac-library-js.license]]
+name = "CC0-1.0"
+url = "https://www.npmjs.com/package/ac-library-js"
+
+[library.data-structure-typed]
+version = "2.0.4"
+
+[[library.data-structure-typed.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/data-structure-typed"
+
+[library.immutable]
+version = "5.1.3"
+
+[[library.immutable.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/immutable"
+
+[library.lodash]
+version = "4.17.21"
+
+[[library.lodash.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/lodash"
+
+[library.mathjs]
+version = "14.7.0"
+
+[[library.mathjs.license]]
+name = "Apache-2.0"
+url = "https://www.npmjs.com/package/mathjs"
+
+[library.tstl]
+version = "3.0.0"
+
+[[library.tstl.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/tstl"
+
+[library."@babel/runtime"]
+indirect = true
+
+[[library."@babel/runtime".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@babel/runtime"
+
+[library."@commander-js/extra-typings"]
+indirect = true
+
+[[library."@commander-js/extra-typings".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@commander-js/extra-typings"
+
+[library."@esbuild/linux-x64"]
+indirect = true
+
+[[library."@esbuild/linux-x64".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/@esbuild/linux-x64"
+
+[library.commander]
+indirect = true
+
+[[library.commander.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/commander"
+
+[library."complex.js"]
+indirect = true
+
+[[library."complex.js".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/complex.js"
+
+[library."decimal.js"]
+indirect = true
+
+[[library."decimal.js".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/decimal.js"
+
+[library.esbuild]
+indirect = true
+
+[[library.esbuild.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/esbuild"
+
+[library.escape-latex]
+indirect = true
+
+[[library.escape-latex.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/escape-latex"
+
+[library."fraction.js"]
+indirect = true
+
+[[library."fraction.js".license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/fraction.js"
+
+[library.javascript-natural-sort]
+indirect = true
+
+[[library.javascript-natural-sort.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/javascript-natural-sort"
+
+[library.seedrandom]
+indirect = true
+
+[[library.seedrandom.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/seedrandom"
+
+[library.tiny-emitter]
+indirect = true
+
+[[library.tiny-emitter.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/tiny-emitter"
+
+[library.typed-function]
+indirect = true
+
+[[library.typed-function.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/typed-function"
+
+[library.undici-types]
+indirect = true
+
+[[library.undici-types.license]]
+name = "MIT"
+url = "https://www.npmjs.com/package/undici-types"

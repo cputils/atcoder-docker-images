@@ -1,0 +1,27 @@
+language = "Whitespace"
+display = "Whitespace (whitespacers 1.3.0)"
+filename = "Main.ws"
+object = "Main.dump"
+compile = """
+wsc --dump Main.dump Main.ws
+"""
+execution = [
+  "wsc",
+  "Main.ws",
+]
+install = """
+export CARGO_HOME=/tmp/.cargo
+export RUSTUP_HOME=/tmp/.rustup
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends git
+curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+export PATH="$CARGO_HOME/bin:$PATH"
+cd /tmp
+cargo install --git https://github.com/CensoredUsername/whitespace-rs --rev 5e496ec
+sudo cp "$CARGO_HOME/bin/wsc" /usr/local/bin
+rm -fr /tmp/.cargo /tmp/.rustup
+"""
+
+[[license]]
+name = "MPL-2.0"
+url = "https://github.com/CensoredUsername/whitespace-rs/blob/master/LICENSE"

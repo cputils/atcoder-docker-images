@@ -1,0 +1,27 @@
+language = "COBOL"
+display = "COBOL (Free) (GnuCOBOL 3.2)"
+filename = "Main.cbl"
+object = "a.out"
+compile = """
+cobc -x -free -O2 -o a.out Main.cbl
+"""
+execution = ["./a.out"]
+install = """
+ATCODER_GNUCOBOL_VERSION=3.2
+
+sudo apt-get update
+sudo apt-get install -y libgmp-dev libcjson-dev
+
+cd /tmp
+wget -q -O gnucobol-bin.tar.xz https://downloads.sourceforge.net/project/gnucobol/gnucobol/${ATCODER_GNUCOBOL_VERSION}/gnucobol-${ATCODER_GNUCOBOL_VERSION}_bin.tar.xz
+sudo tar -C / --strip-components=1 -xf gnucobol-bin.tar.xz
+sudo ldconfig
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://sourceforge.net/p/gnucobol/code/HEAD/tree/tags/gnucobol-3.2/COPYING"
+
+[[license]]
+name = "LGPL-3.0-only"
+url = "https://sourceforge.net/p/gnucobol/code/HEAD/tree/tags/gnucobol-3.2/COPYING.LESSER"

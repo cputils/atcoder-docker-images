@@ -1,0 +1,163 @@
+language = "JavaScript"
+display = "JavaScript (Bun 1.2.21)"
+filename = "Main.js"
+execution = [
+  "bun",
+  "Main.js",
+  "--no-install",
+]
+install = """
+curl -fsSL https://bun.sh/install | bash -s \"bun-v1.2.21\"
+
+export PATH=\"$HOME/.bun/bin:$PATH\"
+
+bun add --no-cache ac-library-js@0.1.1 data-structure-typed@2.0.4 immutable@5.1.3 lodash@4.17.21 mathjs@14.7.0 tstl@3.0.0
+"""
+
+[environment]
+NO_COLOR = "true"
+PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/runner/.bun/bin"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/oven-sh/bun/blob/bun-v1.2.21/LICENSE.md"
+
+[library.ac-library-js]
+version = "0.1.1"
+
+[[library.ac-library-js.license]]
+name = "CC0-1.0"
+url = "https://github.com/e6nlaq/ac-library-js/blob/v0.1.1/LICENSE"
+
+[library.data-structure-typed]
+version = "2.0.4"
+
+[[library.data-structure-typed.license]]
+name = "MIT"
+url = "https://github.com/zrwusa/data-structure-typed/blob/main/LICENSE"
+
+[library.immutable]
+version = "5.1.3"
+
+[[library.immutable.license]]
+name = "MIT"
+url = "https://github.com/immutable-js/immutable-js/blob/main/LICENSE"
+
+[library.lodash]
+version = "4.17.21"
+
+[[library.lodash.license]]
+name = "MIT"
+url = "https://github.com/lodash/lodash/blob/4.17.21/LICENSE"
+
+[library.mathjs]
+version = "14.7.0"
+
+[[library.mathjs.license]]
+name = "Apache-2.0"
+url = "https://github.com/josdejong/mathjs/blob/v14.7.0/LICENSE"
+
+[library.tstl]
+version = "3.0.0"
+
+[[library.tstl.license]]
+name = "MIT"
+url = "https://github.com/samchon/tstl/blob/v3.0.0/LICENSE"
+
+[library."@babel/runtime"]
+indirect = true
+
+[[library."@babel/runtime".license]]
+name = "MIT"
+url = "https://github.com/babel/babel/blob/main/LICENSE"
+
+[library."@commander-js/extra-typings"]
+indirect = true
+
+[[library."@commander-js/extra-typings".license]]
+name = "MIT"
+url = "https://github.com/commander-js/extra-typings/blob/main/LICENSE"
+
+[library."@esbuild/linux-x64"]
+indirect = true
+
+[[library."@esbuild/linux-x64".license]]
+name = "MIT"
+url = "https://github.com/evanw/esbuild/blob/main/LICENSE.md"
+
+[library.commander]
+indirect = true
+
+[[library.commander.license]]
+name = "MIT"
+url = "https://github.com/tj/commander.js/blob/master/LICENSE"
+
+[library."complex.js"]
+indirect = true
+
+[[library."complex.js".license]]
+name = "MIT"
+url = "https://github.com/rawify/Complex.js/blob/main/LICENSE"
+
+[library."decimal.js"]
+indirect = true
+
+[[library."decimal.js".license]]
+name = "MIT"
+url = "https://github.com/MikeMcl/decimal.js/blob/master/LICENCE.md"
+
+[library.esbuild]
+indirect = true
+
+[[library.esbuild.license]]
+name = "MIT"
+url = "https://github.com/evanw/esbuild/blob/main/LICENSE.md"
+
+[library.escape-latex]
+indirect = true
+
+[[library.escape-latex.license]]
+name = "MIT"
+url = "https://github.com/dangmai/escape-latex/blob/master/LICENSE.md"
+
+[library."fraction.js"]
+indirect = true
+
+[[library."fraction.js".license]]
+name = "MIT"
+url = "https://github.com/rawify/Fraction.js/blob/main/LICENSE"
+
+[library.javascript-natural-sort]
+indirect = true
+
+[[library.javascript-natural-sort.license]]
+name = "MIT"
+url = "https://github.com/Bill4Time/javascript-natural-sort/blob/master/naturalSort.js#L2C58-L2C84"
+
+[library.regenerator-runtime]
+indirect = true
+
+[[library.regenerator-runtime.license]]
+name = "MIT"
+url = "https://github.com/facebook/regenerator/blob/main/LICENSE"
+
+[library.seedrandom]
+indirect = true
+
+[[library.seedrandom.license]]
+name = "MIT"
+url = "https://github.com/davidbau/seedrandom/blob/released/seedrandom.js#L2-L21"
+
+[library.tiny-emitter]
+indirect = true
+
+[[library.tiny-emitter.license]]
+name = "MIT"
+url = "https://github.com/scottcorgan/tiny-emitter/blob/master/LICENSE"
+
+[library.typed-function]
+indirect = true
+
+[[library.typed-function.license]]
+name = "MIT"
+url = "https://github.com/josdejong/typed-function/blob/master/LICENSE"

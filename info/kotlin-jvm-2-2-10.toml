@@ -1,0 +1,67 @@
+language = "Kotlin"
+display = "Kotlin (Kotlin/JVM 2.2.10)"
+filename = "Main.kt"
+object = "Main.jar"
+compile = """
+/usr/local/kotlinc/bin/kotlinc ./Main.kt -cp ac_library.jar:kotlinx-collections-immutable-jvm.jar -include-runtime -jvm-target 23 -d ./Main.jar
+"""
+execution = [
+  "sh",
+  "kotlin.sh",
+  "{memory:mb}",
+]
+install = """
+sudo apt update
+sudo apt install -y curl unzip wget
+
+cd /tmp
+wget https://github.com/JetBrains/kotlin/releases/download/v2.2.10/kotlin-compiler-2.2.10.zip
+mv kotlin-compiler-2.2.10.zip kotlin-compiler.zip
+sudo unzip kotlin-compiler.zip -d /usr/local
+
+curl https://download.java.net/java/GA/jdk23.0.2/6da2a6609d6e406f85c491fcb119101b/7/GPL/openjdk-23.0.2_linux-x64_bin.tar.gz | sudo tar zx -C /usr/local --strip-component 1
+
+wget https://github.com/ocha98/ac-library-java/releases/download/v2.0.0/ac_library23.jar
+
+wget https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-collections-immutable-jvm/0.4.0/kotlinx-collections-immutable-jvm-0.4.0.jar
+
+cd /judge
+
+mv /tmp/ac_library23.jar ac_library.jar
+
+mv /tmp/kotlinx-collections-immutable-jvm-0.4.0.jar kotlinx-collections-immutable-jvm.jar
+
+cat << 'EOF' > kotlin.sh
+#!/bin/sh
+if [ \"$1\" -gt 1024 ]; then
+  stack_size=1024
+else
+  stack_size=\"$1\"
+fi
+
+java -Xss\"$stack_size\"M -DONLINE_JUDGE=true -cp ac_library.jar:kotlinx-collections-immutable-jvm.jar:Main.jar MainKt
+EOF
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/JetBrains/kotlin/blob/master/license/LICENSE.txt"
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://openjdk.org/legal/gplv2+ce.html"
+exception = "Classpath-exception-2.0"
+
+[library.ac-library-java]
+version = "v2.0.0"
+
+[[library.ac-library-java.license]]
+name = "CC0-1.0"
+url = "https://github.com/ocha98/ac-library-java/blob/main/LICENSE"
+
+[library.kotlinx-collections-immutable]
+version = "v0.4.0"
+
+[[library.kotlinx-collections-immutable.license]]
+name = "Apache-2.0"
+url = "https://github.com/Kotlin/kotlinx.collections.immutable/blob/master/LICENSE.txt"

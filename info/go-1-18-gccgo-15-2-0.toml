@@ -1,0 +1,71 @@
+language = "Go"
+display = "Go 1.18 (gccgo 15.2.0)"
+filename = "main.go"
+object = "a.out"
+compile = """
+go-15 build -o a.out
+"""
+execution = ["./a.out"]
+install = """
+AC2025_GCC_VERSION=15.2.0
+AC2025_GCC_MAJOR_VERSION=$(echo \"$AC2025_GCC_VERSION\" | cut -d'.' -f1)
+
+sudo apt-get update
+sudo apt-get install --no-install-recommends -y software-properties-common
+sudo add-apt-repository -y ppa:puni070/gcc-noble
+sudo apt-get install -y gccgo-${AC2025_GCC_MAJOR_VERSION} git libgmp-dev binutils-dev libmpfr-dev libmpc-dev libisl-dev libzstd-dev zlib1g-dev
+
+go-${AC2025_GCC_MAJOR_VERSION} mod init atcoder.jp/golang
+go-${AC2025_GCC_MAJOR_VERSION} get \\
+  github.com/emirpasic/gods \\
+  gonum.org/v1/gonum \\
+  github.com/liyue201/gostl \\
+  github.com/benbjohnson/immutable@v0.3.0 \\
+  golang.org/x/exp \\
+  github.com/monkukui/ac-library-go
+"""
+
+[[license]]
+name = "GPL-3.0-only"
+url = "https://gcc.gnu.org/onlinedocs/gcc-15.2.0/gcc/Copying.html"
+
+[library.gods]
+
+[[library.gods.license]]
+name = "BSD-2-Clause"
+url = "https://github.com/emirpasic/gods/blob/master/LICENSE"
+
+[[library.gods.license]]
+name = "ISC"
+url = "https://github.com/emirpasic/gods/blob/master/LICENSE"
+
+[library.gonum]
+
+[[library.gonum.license]]
+name = "BSD-3-Clause"
+url = "https://github.com/gonum/gonum/blob/master/LICENSE"
+
+[library.gostl]
+
+[[library.gostl.license]]
+name = "MIT"
+url = "https://github.com/liyue201/gostl/blob/master/LICENSE"
+
+[library.immutable]
+version = "v0.3.0"
+
+[[library.immutable.license]]
+name = "MIT"
+url = "https://github.com/benbjohnson/immutable/blob/master/LICENSE"
+
+[library.golang_org_x_exp]
+
+[[library.golang_org_x_exp.license]]
+name = "BSD-3-Clause"
+url = "https://cs.opensource.google/go/x/exp/+/master:LICENSE"
+
+[library.ac-library-go]
+
+[[library.ac-library-go.license]]
+name = "CC0-1.0"
+url = "https://github.com/monkukui/ac-library-go/blob/master/LICENSE"

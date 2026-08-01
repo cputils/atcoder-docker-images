@@ -1,0 +1,24 @@
+language = "C3"
+display = "C3 (c3c 0.7.5)"
+filename = "Main.c3"
+object = "a.out"
+compile = """
+$HOME/c3/c3c -q --ansi=no compile -O5 --x86cpu=native -o a.out Main.c3
+"""
+execution = ["./a.out"]
+install = """
+sudo apt-get update
+sudo apt-get install -y libxml2
+
+cd /tmp
+wget -q https://github.com/c3lang/c3c/releases/download/v0.7.5/c3-linux.tar.gz
+tar -C $HOME -xf c3-linux.tar.gz
+"""
+
+[[license]]
+name = "LGPL-3.0-only"
+url = "https://github.com/c3lang/c3c/blob/master/LICENSE"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/c3lang/c3c/blob/master/LICENSE_STDLIB"

@@ -1,0 +1,25 @@
+language = "Bash"
+display = "Bash (bash 5.3)"
+filename = "Main.bash"
+object = "ok"
+compile = """
+bash -n Main.bash && touch ok
+"""
+execution = [
+  "bash",
+  "Main.bash",
+]
+install = """
+cd /tmp
+wget -q -O bash.tar.gz https://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz
+mkdir bash
+tar -C bash --strip-components=1 -xf bash.tar.gz
+cd bash
+./configure --enable-largefile --without-bash-malloc
+make -j$(nproc)
+sudo make install
+"""
+
+[[license]]
+name = "GPL-3.0-or-later"
+url = "https://www.gnu.org/software/bash/"

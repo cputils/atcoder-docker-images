@@ -1,0 +1,17 @@
+language = "Pascal"
+display = "Pascal (fpc 3.2.2)"
+filename = "Main.p"
+object = "a.out"
+compile = """
+fpc -O2 -Sd -Sh -v0 -oa.out Main.p | grep -v -E '^(Free Pascal|Copyright)' 1>&2
+"""
+execution = ["./a.out"]
+install = "sudo apt update && sudo apt install -y fp-compiler-3.2.2"
+
+[[license]]
+name = "!License-23"
+url = "https://gitlab.com/freepascal.org/fpc/source/-/blob/release_3_2_2/rtl/COPYING.txt"
+
+[[license]]
+name = "GPL-2.0-or-later"
+url = "https://gitlab.com/freepascal.org/fpc/source/-/blob/release_3_2_2/compiler/COPYING.txt"

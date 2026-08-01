@@ -1,0 +1,23 @@
+language = "Assembly x64"
+display = "Assembly x64 (NASM 2.16.03)"
+filename = "Main.asm"
+object = "a.out"
+compile = """
+nasm -f elf64 Main.asm && gcc -o a.out Main.o -lm
+"""
+execution = ["./a.out"]
+install = """
+AC_NASM_VERSION=2.16.03
+cd /tmp
+wget -q -O nasm.tar.xz https://www.nasm.us/pub/nasm/releasebuilds/${AC_NASM_VERSION}/nasm-${AC_NASM_VERSION}.tar.xz
+mkdir nasm
+tar -C nasm --strip-components=1 -xf nasm.tar.xz
+cd nasm
+sh configure
+make -j$(nproc)
+sudo make install
+"""
+
+[[license]]
+name = "BSD-2-Clause"
+url = "https://github.com/netwide-assembler/nasm/blob/master/LICENSE"

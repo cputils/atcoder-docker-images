@@ -1,0 +1,83 @@
+language = "Lean"
+display = "Lean (lean v4.22.0)"
+filename = "atcoder/Main.lean"
+object = "atcoder/.lake/build/bin/atcoder"
+compile = """
+export PATH=~/.elan/bin:$PATH
+cd atcoder
+lake -q build 1>&2
+"""
+execution = ["./atcoder/.lake/build/bin/atcoder"]
+install = """
+AC_LEAN4_VERSION=\"v4.22.0\"
+sudo apt-get update
+sudo apt-get install -y git
+curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o /tmp/elan-init.sh
+pushd /tmp
+chmod +x elan-init.sh
+./elan-init.sh -y --default-toolchain leanprover/lean4:${AC_LEAN4_VERSION}
+popd
+export PATH=~/.elan/bin:$PATH
+lake new atcoder exe
+cd atcoder
+cat << EOF >> lakefile.toml
+
+[[require]]
+name = \"Regex\"
+git = \"https://github.com/pandaman64/lean-regex\"
+rev = \"${AC_LEAN4_VERSION}\"
+subDir = \"regex\"
+
+[[require]]
+name = \"mathlib\"
+scope = \"leanprover-community\"
+rev = \"${AC_LEAN4_VERSION}\"
+
+[[require]]
+name = \"Parser\"
+scope = \"fgdorais\"
+rev = \"617f4fa\"
+EOF
+
+cat << 'EOF' > Main.lean
+import Mathlib
+import Parser
+import Regex.Regex.Utilities
+import Regex.Regex.Elab
+
+def main : IO Unit := do
+  IO.println s!\"Hello, sqrt 9 = {Nat.sqrt 9}\"
+  let re := Regex.parse! r##\"bool|boolean\"##
+  IO.println s!\"{re.find \"boolean\"}\"
+EOF
+
+lake exe cache get
+lake build
+.lake/build/bin/atcoder
+rm .lake/build/bin/atcoder
+"""
+
+[[license]]
+name = "Apache-2.0"
+url = "https://github.com/leanprover/lean4/blob/master/LICENSE"
+
+[library.lean-regex]
+version = "v4.22.0"
+
+[[library.lean-regex.license]]
+name = "Apache-2.0"
+url = "https://github.com/pandaman64/lean-regex/blob/main/LICENSE"
+
+[library.mathlib]
+version = "v4.22.0"
+
+[[library.mathlib.license]]
+name = "Apache-2.0"
+url = "https://github.com/leanprover-community/mathlib4/blob/master/LICENSE"
+
+[library.parser]
+version = "617f4fa"
+
+[[library.parser.license]]
+name = "Apache-2.0"
+url = "https://github.com/fgdorais/lean4-parser/blob/main/LICENSE"
