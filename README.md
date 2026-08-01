@@ -48,21 +48,6 @@ If you are choosing an image, start with the filename stem under `info/`, then c
 
 `patches/` contains short notes for images that need extra handling. The patch filename matches the image stem, and each file names its target language:
 
-- [`ada-2022-gnat-15-2-0.md`](patches/ada-2022-gnat-15-2-0.md) — Ada
-- [`clay-20250308-1-gcc-15-2-0.md`](patches/clay-20250308-1-gcc-15-2-0.md) — cLay
-- [`eiffel-liberty-eiffel-07829e3.md`](patches/eiffel-liberty-eiffel-07829e3.md) — Liberty Eiffel
-- [`jule-0-1-6.md`](patches/jule-0-1-6.md) — Jule
-- [`kuin-kuincl-v-2021-8-17.md`](patches/kuin-kuincl-v-2021-8-17.md) — Kuin
-- [`julia-1-11-6.md`](patches/julia-1-11-6.md) — Julia
-- [`gleam-1-12-0-otp-28-0-2.md`](patches/gleam-1-12-0-otp-28-0-2.md) — Gleam
-- [`pony-ponyc-0-59-0.md`](patches/pony-ponyc-0-59-0.md) — Pony
-- [`python-codon-0-19-3.md`](patches/python-codon-0-19-3.md) — Codon
-- [`python-pypy-3-11-v7-3-20.md`](patches/python-pypy-3-11-v7-3-20.md) — PyPy
-- [`ruby-3-3-truffleruby-25-0-0.md`](patches/ruby-3-3-truffleruby-25-0-0.md) — TruffleRuby
-- [`ruby-3-4-5.md`](patches/ruby-3-4-5.md) — Ruby
-- [`sagemath-10-7.md`](patches/sagemath-10-7.md) — SageMath
-- [`whitespace-whitespacers-1-3-0.md`](patches/whitespace-whitespacers-1-3-0.md) — Whitespace
-
 If a language has a patch file, read it before using that image.
 
 ## Build locally (optional)
