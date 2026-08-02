@@ -4,7 +4,7 @@
 Pin fishr to a revision compatible with the available Rust toolchain.
 
 ## Changes
-- Pinned fishr to the last commit before its Rust 2024 edition migration.
+- Pinned fishr to the last commit before its source adopted let-chain syntax.
 
 ## Notes
-- Later revisions require a Rust toolchain newer than the one provided by Ubuntu 24.04.
+- The let-chain syntax used by later revisions is not supported by Ubuntu 24.04's Rust 1.75 compiler.

@@ -1,10 +1,10 @@
 # Fix (1.1.0-alpha.12)
 
 ## Summary
-Align the `ring-buffer` dependency with `cp-library`.
+Resolve the compiler-compatible `ring-buffer` version before `cp-library`.
 
 ## Changes
-- Updated `ring-buffer` from `0.1.1` to `0.1.2`.
+- Moved the pinned `ring-buffer` 0.1.1 dependency before `cp-library`.
 
 ## Notes
-- `cp-library` selects `ring-buffer` 0.1.2, and Fix requires the same exact version.
+- Resolving `cp-library` first selects `ring-buffer` 0.1.2, which uses APIs unsupported by Fix 1.1.0-alpha.12.
