@@ -1,14 +1,20 @@
 # Jule (0.1.6)
 
 ## Summary
-Update the LightGBM fetch path and cap Jule build jobs.
+Use the official LLVM distribution, update the LightGBM fetch path, and reduce resource usage during installation.
 
 ## Changes
+- Replaced the local LLVM source build with the official LLVM 21.1.0 Linux X64 distribution.
+- Streamed the LLVM archive directly into `/usr/local` without storing a temporary copy.
+- Built only LLVM libc and OpenMP from the matching 21.1.0 source because they are not included in the official distribution.
+- Removed downloaded archives, source trees, and build trees after their installed files were copied.
 - Switched the LightGBM release download owner to `lightgbm-org`.
 - Updated the extracted source directory path to `lightgbm-org-LightGBM`.
 - Updated the LightGBM license URL to the new repository.
-- Changed the LLVM build to use `LLVM_PARALLEL_LINK_JOBS=1`.
-- Disable parallel building of OR-Tools.
+- Disabled parallel building of OR-Tools.
 
 ## Notes
+- Building LLVM and its runtimes from source exceeded the two-hour CI job limit before the remaining libraries could be installed.
+- The official distribution keeps LLVM, Clang, LLD, Polly, compiler-rt, libc++, libc++abi, and libunwind at 21.1.0.
+- Cleanup is performed only after installation and does not remove installed files.
 - `microsoft/LightGBM` now serves redirect metadata, so the old download path no longer fetches the source tarball correctly.

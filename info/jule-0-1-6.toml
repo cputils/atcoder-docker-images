@@ -10,11 +10,12 @@ install = """
 AC2025_GCC_VERSION=15.2.0
 AC2025_GCC_MAJOR_VERSION=$(echo \"$AC2025_GCC_VERSION\" | cut -d'.' -f1)
 AC2025_LLVM_VERSION=21.1.0
+AC2025_LLVM_MAJOR_VERSION=$(echo \"$AC2025_LLVM_VERSION\" | cut -d'.' -f1)
 
 sudo apt-get update
 sudo apt-get install --no-install-recommends -y software-properties-common
 sudo add-apt-repository -y ppa:puni070/gcc-noble
-sudo apt-get install -y ansifilter cmake libgmp-dev libeigen3-dev zlib1g-dev libgtest-dev git libbenchmark-dev libgmock-dev binutils-dev libmpfr-dev libmpc-dev libisl-dev libzstd-dev zlib1g-dev libbz2-dev libtbb12 libopenblas0 liblapack3 libmetis5 patchelf
+sudo apt-get install -y ansifilter cmake ninja-build libgmp-dev libeigen3-dev zlib1g-dev libgtest-dev git libbenchmark-dev libgmock-dev binutils-dev libmpfr-dev libmpc-dev libisl-dev libzstd-dev zlib1g-dev libbz2-dev libtbb12 libopenblas0 liblapack3 libmetis5 patchelf
 
 sudo apt-get --purge remove -y cpp
 sudo apt-get install -y g++-${AC2025_GCC_MAJOR_VERSION}
@@ -91,18 +92,30 @@ pushd /tmp
 # Install jule
 wget -nv https://github.com/julelang/jule/releases/download/jule0.1.6/jule-linux-amd64.zip
 unzip -q jule-linux-amd64.zip -x '__MACOSX/*' -d $HOME
+rm -f jule-linux-amd64.zip
 
 # Install clang
-# gh_download_latest \"llvm\" \"llvm-project\"
-wget -nv -O llvm.tar.gz https://api.github.com/repos/llvm/llvm-project/tarball/llvmorg-${AC2025_LLVM_VERSION}
-mkdir llvm-llvm-project
-tar -C llvm-llvm-project -xf llvm.tar.gz
-pushd llvm-llvm-project/*
-cmake -S llvm -B build -DLLVM_ENABLE_PROJECTS=\"clang;lld;polly\" -DCMAKE_BUILD_TYPE=Release -DLLVM_PARALLEL_COMPILE_JOBS=$(nproc) -DLLVM_PARALLEL_LINK_JOBS=1 -DLLVM_PARALLEL_TABLEGEN_JOBS=$(nproc) -DLLVM_ENABLE_RUNTIMES=\"libc;libunwind;libcxxabi;libcxx;compiler-rt;openmp\" -DLLVM_TARGETS_TO_BUILD=host -DLLVM_BINUTILS_INCDIR=/usr/include
-cmake --build build -j$(nproc)
-sudo cmake --build build --target install
+wget -nv -O - \"https://github.com/llvm/llvm-project/releases/download/llvmorg-${AC2025_LLVM_VERSION}/LLVM-${AC2025_LLVM_VERSION}-Linux-X64.tar.xz\" \\
+  | sudo tar --no-same-owner -xJ -C /usr/local --strip-components=1
+
+wget -nv -O llvm-project.tar.xz \"https://github.com/llvm/llvm-project/releases/download/llvmorg-${AC2025_LLVM_VERSION}/llvm-project-${AC2025_LLVM_VERSION}.src.tar.xz\"
+mkdir llvm-project
+tar -xJ -C llvm-project --strip-components=1 -f llvm-project.tar.xz
+cmake -G Ninja -S llvm-project/runtimes -B llvm-runtimes-build \\
+  -DCMAKE_BUILD_TYPE=Release \\
+  -DCMAKE_C_COMPILER=/usr/local/bin/clang \\
+  -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \\
+  -DCMAKE_C_FLAGS="-I$PWD/llvm-runtimes-build/lib/clang/${AC2025_LLVM_MAJOR_VERSION}/include" \\
+  -DCMAKE_CXX_FLAGS="-I$PWD/llvm-runtimes-build/lib/clang/${AC2025_LLVM_MAJOR_VERSION}/include" \\
+  -DCLANG_VERSION_MAJOR=${AC2025_LLVM_MAJOR_VERSION} \\
+  -DLLVM_ENABLE_RUNTIMES=\"libc;openmp\" \\
+  -DLLVM_INCLUDE_TESTS=OFF
+cmake --build llvm-runtimes-build -j$(nproc)
+sudo cmake --install llvm-runtimes-build
+rm -f llvm-project.tar.xz
+rm -rf llvm-project llvm-runtimes-build
+
 echo \"/usr/local/lib/x86_64-unknown-linux-gnu\" | sudo tee /etc/ld.so.conf.d/x86_64-unknown-linux-gnu.conf
-popd
 sudo ldconfig
 
 # Install libraries
@@ -125,12 +138,16 @@ cd ..
 sudo cmake --build build --target install -j $(nproc)
 sudo ldconfig
 popd
+rm -f abseil.tar.gz
+rm -rf abseil-cpp
 
 # gh_download_latest \"atcoder\" \"ac-library\"
 wget -nv -O ac-library.tar.gz https://github.com/atcoder/ac-library/archive/refs/tags/v1.6.tar.gz
 mkdir atcoder-ac-library
 tar -C atcoder-ac-library -xf ac-library.tar.gz
 sudo cp -a --no-preserve=ownership atcoder-ac-library/*/atcoder /usr/local/include
+rm -f ac-library.tar.gz
+rm -rf atcoder-ac-library
 
 gh_download_latest \"boostorg\" \"boost\" \"b2-nodocs\" \"xz\" \"beta\"
 pushd boostorg-boost/*
@@ -138,6 +155,8 @@ pushd boostorg-boost/*
 ./b2 -j$(nproc) toolset=gcc variant=release cxxflags=\"-std=c++20\" stage
 sudo ./b2 -j$(nproc) toolset=gcc variant=release cxxflags=\"-std=c++20\" install
 popd
+rm -f boostorg-boost-tarball
+rm -rf boostorg-boost
 
 gh_download_latest \"arximboldi\" \"immer\"
 pushd arximboldi-immer/*
@@ -145,6 +164,8 @@ cmake -B build -Dimmer_BUILD_TESTS:BOOL=OFF -Dimmer_BUILD_DOCS:BOOL=OFF -Dimmer_
 cmake --build build --config Release --target all
 sudo cmake --build build --target install
 popd
+rm -f arximboldi-immer-tarball
+rm -rf arximboldi-immer
 
 AC_LIBTORCH_VERSION=\"$(gh_latest_version \"pytorch\" \"pytorch\")\"
 wget -nv -O libtorch.zip https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-\"$AC_LIBTORCH_VERSION\"%2Bcpu.zip
@@ -155,6 +176,8 @@ sudo cp -a --no-preserve=ownership lib /usr/local/lib/libtorch
 echo /usr/local/lib/libtorch | sudo tee /etc/ld.so.conf.d/libtorch.conf
 echo \"libtorch $AC_LIBTORCH_VERSION\" >> $HOME/library_version
 popd
+rm -f libtorch.zip
+rm -rf libtorch
 
 wget -nv https://github.com/ei1333/library/archive/refs/heads/master.tar.gz
 mkdir ei1333-library
@@ -166,12 +189,16 @@ sudo cp -a --no-preserve=ownership . /usr/local/include/ei1333
 AC_EI1333_VERSION=\"$(curl -s https://api.github.com/repos/ei1333/library/branches/master | grep -m 1 sha |cut -d'\"' -f4)\"
 echo \"ei1333-library $AC_EI1333_VERSION\" >> $HOME/library_version
 popd
+rm -f master.tar.gz
+rm -rf ei1333-library
 
 gh_download_latest \"martinus\" \"unordered_dense\"
 pushd martinus-unordered_dense/*
 cmake -B build
 sudo cmake --build build --target install
 popd
+rm -f martinus-unordered_dense-tarball
+rm -rf martinus-unordered_dense
 
 gh_download_latest \"lightgbm-org\" \"LightGBM\" \"complete_source_code\" \"tar.gz\"
 pushd lightgbm-org-LightGBM
@@ -179,11 +206,15 @@ cmake -B build -S .
 cmake --build build -j$(nproc)
 sudo cmake --build build -j$(nproc) --target install
 popd
+rm -f lightgbm-org-LightGBM-tarball
+rm -rf lightgbm-org-LightGBM
 
 wget -nv -O scip.sh https://scipopt.org/download/release/SCIPOptSuite-9.2.3-Linux-ubuntu24.sh
 chmod +x scip.sh
 ./scip.sh --skip-license --include-subdir --prefix=scip
 sudo cp -a --no-preserve=ownership scip/*/* /usr/local
+rm -f scip.sh
+rm -rf scip
 
 gh_download_latest \"ERGO-Code\" \"HiGHS\"
 pushd ERGO-Code-HiGHS/*
@@ -191,6 +222,8 @@ cmake -S. -B build
 cmake --build build -j $(nproc)
 sudo cmake --install build
 popd
+rm -f ERGO-Code-HiGHS-tarball
+rm -rf ERGO-Code-HiGHS
 
 gh_download_latest \"google\" \"or-tools\"
 pushd google-or-tools/*
@@ -199,6 +232,8 @@ cmake -B build -DBUILD_Protobuf:BOOL=ON -DBUILD_re2:BOOL=ON -DBUILD_CoinUtils:BO
 cmake --build build --config Release --target all -j 1
 sudo cmake --build build --config Release --target install -j $(nproc)
 popd
+rm -f google-or-tools-tarball
+rm -rf google-or-tools
 
 gh_download_latest \"Z3Prover\" \"z3\"
 pushd Z3Prover-z3/*
@@ -206,6 +241,8 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j $(nproc)
 sudo cmake --build build --target install
 popd
+rm -f Z3Prover-z3-tarball
+rm -rf Z3Prover-z3
 
 sudo ldconfig
 
