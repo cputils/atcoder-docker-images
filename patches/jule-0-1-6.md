@@ -1,7 +1,7 @@
 # Jule (0.1.6)
 
 ## Summary
-Use the official LLVM distribution, skip installation-only tests, update the LightGBM fetch path, and reduce resource usage during installation.
+Use the official LLVM distribution, pin compatible library versions, skip installation-only tests, update the LightGBM fetch path, and reduce resource usage during installation.
 
 ## Changes
 - Replaced the local LLVM source build with the official LLVM 21.1.0 Linux X64 distribution.
@@ -13,6 +13,7 @@ Use the official LLVM distribution, skip installation-only tests, update the Lig
 - Switched the LightGBM release download owner to `lightgbm-org`.
 - Updated the extracted source directory path to `lightgbm-org-LightGBM`.
 - Updated the LightGBM license URL to the new repository.
+- Pinned OR-Tools to 9.14 to match the installed Abseil 20250512.1 release.
 - Disabled parallel building of OR-Tools.
 
 ## Notes
@@ -22,3 +23,4 @@ Use the official LLVM distribution, skip installation-only tests, update the Lig
 - Abseil tests increase peak resource usage and are not required to install the library.
 - Cleanup is performed only after installation and does not remove installed files.
 - `microsoft/LightGBM` now serves redirect metadata, so the old download path no longer fetches the source tarball correctly.
+- Newer OR-Tools releases require a newer Abseil API and cannot be built with the version used by AtCoder.

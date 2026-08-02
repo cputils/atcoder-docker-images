@@ -260,14 +260,19 @@ popd
 rm -f ERGO-Code-HiGHS-tarball
 rm -rf ERGO-Code-HiGHS
 
-gh_download_latest \"google\" \"or-tools\"
+# Pin OR-Tools to v9.14 to match AtCoder's environment.
+AC_ORTOOLS_VERSION=\"9.14\"
+wget -nv -O or-tools.tar.gz https://github.com/google/or-tools/releases/download/v${AC_ORTOOLS_VERSION}/or-tools-${AC_ORTOOLS_VERSION}.tar.gz
+mkdir google-or-tools
+tar -C google-or-tools -xf or-tools.tar.gz
+echo \"google/or-tools $AC_ORTOOLS_VERSION\" >> $HOME/library_version
 pushd google-or-tools/*
 find . -type f -exec sed -i 's/SCIP::libscip/libscip/g' {} +
 cmake -B build -DBUILD_Protobuf:BOOL=ON -DBUILD_re2:BOOL=ON -DBUILD_CoinUtils:BOOL=ON -DBUILD_Osi:BOOL=ON -DBUILD_Clp:BOOL=ON -DBUILD_Cgl:BOOL=ON -DBUILD_Cbc:BOOL=ON -DUSE_HIGHS:BOOL=ON -DBUILD_SAMPLES:BOOL=OFF -DBUILD_EXAMPLES:BOOL=OFF -DBUILD_TESTING:BOOL=OFF -DCMAKE_CXX_STANDARD=20
 cmake --build build --config Release --target all -j 1
 sudo cmake --build build --config Release --target install -j $(nproc)
 popd
-rm -f google-or-tools-tarball
+rm -f or-tools.tar.gz
 rm -rf google-or-tools
 
 gh_download_latest \"Z3Prover\" \"z3\"
