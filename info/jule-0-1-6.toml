@@ -95,8 +95,46 @@ unzip -q jule-linux-amd64.zip -x '__MACOSX/*' -d $HOME
 rm -f jule-linux-amd64.zip
 
 # Install clang
+AC2025_LLVM_EXCLUDES=(
+  --exclude='*/local/*'
+  --exclude='*/bin/mlir*'
+  --exclude='*/bin/tblgen-lsp-server'
+  --exclude='*/bin/tblgen-to-irdl'
+  --exclude='*/bin/transform-lsp-server'
+  --exclude='*/bin/bbc'
+  --exclude='*/bin/firtool'
+  --exclude='*/bin/fir-*'
+  --exclude='*/bin/tco'
+  --exclude='*/bin/f18-*'
+  --exclude='*/bin/flang*'
+  --exclude='*/bin/lldb*'
+  --exclude='*/bin/*bolt*'
+  --exclude='*/bin/perf2bolt'
+  --exclude='*/bin/merge-fdata'
+  --exclude='*/include/mlir*'
+  --exclude='*/include/flang*'
+  --exclude='*/include/lldb*'
+  --exclude='*/lib/libMLIR*'
+  --exclude='*/lib/libmlir*'
+  --exclude='*/lib/libFIR*'
+  --exclude='*/lib/libFortran*'
+  --exclude='*/lib/libFlang*'
+  --exclude='*/lib/libflang*'
+  --exclude='*/lib/liblldb*'
+  --exclude='*/lib/libLLVMBOLT*'
+  --exclude='*/lib/clang/*/lib/*/libflang*'
+  --exclude='*/lib/objects-*/obj.MLIR*'
+  --exclude='*/lib/cmake/mlir*'
+  --exclude='*/lib/cmake/MLIR*'
+  --exclude='*/lib/cmake/flang*'
+  --exclude='*/lib/cmake/Flang*'
+  --exclude='*/lib/cmake/lldb*'
+  --exclude='*/lib/cmake/LLDB*'
+  --exclude='*/lib/cmake/bolt*'
+  --exclude='*/lib/cmake/BOLT*'
+)
 wget -nv -O - \"https://github.com/llvm/llvm-project/releases/download/llvmorg-${AC2025_LLVM_VERSION}/LLVM-${AC2025_LLVM_VERSION}-Linux-X64.tar.xz\" \\
-  | sudo tar --no-same-owner -xJ -C /usr/local --strip-components=1
+  | sudo tar --no-same-owner -xJ -C /usr/local --strip-components=1 \"${AC2025_LLVM_EXCLUDES[@]}\"
 
 wget -nv -O llvm-project.tar.xz \"https://github.com/llvm/llvm-project/releases/download/llvmorg-${AC2025_LLVM_VERSION}/llvm-project-${AC2025_LLVM_VERSION}.src.tar.xz\"
 mkdir llvm-project
@@ -130,11 +168,8 @@ mkdir abseil-cpp
 tar -C abseil-cpp -xf abseil.tar.gz
 pushd abseil-cpp/abseil*
 
-cmake -DABSL_BUILD_TESTING=ON -DABSL_USE_GOOGLETEST_HEAD=ON -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_FLAGS:STRING=\"-O2 -fPIC\" -B build
+cmake -DABSL_BUILD_TESTING=OFF -DABSL_USE_GOOGLETEST_HEAD=OFF -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_FLAGS:STRING=\"-O2 -fPIC\" -B build
 cmake --build build --config Release --target all -j $(nproc)
-cd build
-ctest -j$(nproc) --repeat until-pass:5 || ctest --rerun-failed
-cd ..
 sudo cmake --build build --target install -j $(nproc)
 sudo ldconfig
 popd
