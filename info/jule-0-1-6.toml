@@ -139,6 +139,24 @@ wget -nv -O - \"https://github.com/llvm/llvm-project/releases/download/llvmorg-$
 wget -nv -O llvm-project.tar.xz \"https://github.com/llvm/llvm-project/releases/download/llvmorg-${AC2025_LLVM_VERSION}/llvm-project-${AC2025_LLVM_VERSION}.src.tar.xz\"
 mkdir llvm-project
 tar -xJ -C llvm-project --strip-components=1 -f llvm-project.tar.xz
+mkdir -p llvm-gold-include/llvm/Config
+printf '#define HAVE_STDINT_H 1\\n' > llvm-gold-include/llvm/Config/config.h
+printf 'LLVM_%s { global: onload; local: *; };\\n' "${AC2025_LLVM_VERSION%.*}" > LLVMgold.exports
+/usr/local/bin/clang++ \\
+  -Illvm-gold-include \\
+  $(/usr/local/bin/llvm-config --cxxflags) \\
+  -fPIC -shared \\
+  -I/usr/include \\
+  llvm-project/llvm/tools/gold/gold-plugin.cpp \\
+  -Wl,--version-script=LLVMgold.exports \\
+  -Wl,-z,defs \\
+  -Wl,-z,nodelete \\
+  -Wl,-rpath,'$ORIGIN/../lib' \\
+  $(/usr/local/bin/llvm-config --ldflags --libs all --system-libs) \\
+  -o LLVMgold.so
+sudo install -m 755 LLVMgold.so /usr/local/lib/LLVMgold.so
+rm -f LLVMgold.so LLVMgold.exports
+rm -rf llvm-gold-include
 cmake -G Ninja -S llvm-project/runtimes -B llvm-runtimes-build \\
   -DCMAKE_BUILD_TYPE=Release \\
   -DCMAKE_C_COMPILER=/usr/local/bin/clang \\
