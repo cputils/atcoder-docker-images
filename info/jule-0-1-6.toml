@@ -141,6 +141,9 @@ mkdir llvm-project
 tar -xJ -C llvm-project --strip-components=1 -f llvm-project.tar.xz
 mkdir -p llvm-gold-include/llvm/Config
 printf '#define HAVE_STDINT_H 1\\n' > llvm-gold-include/llvm/Config/config.h
+printf 'LLVM_TARGET(X86)\\n#undef LLVM_TARGET\\n' > llvm-gold-include/llvm/Config/Targets.def
+printf 'LLVM_ASM_PARSER(X86)\\n#undef LLVM_ASM_PARSER\\n' > llvm-gold-include/llvm/Config/AsmParsers.def
+printf 'LLVM_ASM_PRINTER(X86)\\n#undef LLVM_ASM_PRINTER\\n' > llvm-gold-include/llvm/Config/AsmPrinters.def
 printf 'LLVM_%s { global: onload; local: *; };\\n' "${AC2025_LLVM_VERSION%.*}" > LLVMgold.exports
 /usr/local/bin/clang++ \\
   -Illvm-gold-include \\
@@ -148,11 +151,12 @@ printf 'LLVM_%s { global: onload; local: *; };\\n' "${AC2025_LLVM_VERSION%.*}" >
   -fPIC -shared \\
   -I/usr/include \\
   llvm-project/llvm/tools/gold/gold-plugin.cpp \\
+  -fuse-ld=lld \\
   -Wl,--version-script=LLVMgold.exports \\
   -Wl,-z,defs \\
   -Wl,-z,nodelete \\
   -Wl,-rpath,'$ORIGIN/../lib' \\
-  $(/usr/local/bin/llvm-config --ldflags --libs all --system-libs) \\
+  $(/usr/local/bin/llvm-config --link-static --ldflags --libs linker lto bitwriter ipo targetparser native --system-libs) \\
   -o LLVMgold.so
 sudo install -m 755 LLVMgold.so /usr/local/lib/LLVMgold.so
 rm -f LLVMgold.so LLVMgold.exports

@@ -8,7 +8,7 @@ Use the official LLVM distribution, pin compatible library versions, skip instal
 - Streamed the LLVM archive directly into `/usr/local` without storing a temporary copy.
 - Excluded MLIR, Flang, LLDB, and BOLT components that were not enabled by the original installation script.
 - Built LLVM libc and OpenMP from the matching 21.1.0 source because they are not included in the official distribution.
-- Built the LLVM gold linker plugin from the matching 21.1.0 source because it is not included in the official distribution.
+- Built the host-target LLVM gold linker plugin from the matching 21.1.0 source with LLD because it is not included in the official distribution and its LLVM dependencies contain bitcode.
 - Disabled Abseil tests during image installation.
 - Removed downloaded archives, source trees, and build trees after their installed files were copied.
 - Switched the LightGBM release download owner to `lightgbm-org`.
