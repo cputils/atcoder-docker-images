@@ -7,23 +7,13 @@ export DOTNET_EnableWriteXorExecute=0
 dotnet publish -c Release -o publish -v q --nologo 1>&2'''
 execution = ["./publish/Main"]
 install = '''
-# パッケージリポジトリの設定
-wget -q https://packages.microsoft.com/config/ubuntu/22.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-sudo dpkg -i packages-microsoft-prod.deb
-rm packages-microsoft-prod.deb
-sudo sh -c "cat > /etc/apt/preferences.d/dotnet <<'EOF'
-Package: dotnet*
-Pin: origin packages.microsoft.com
-Pin-Priority: 1001
-EOF"
-sudo sh -c "cat > /etc/apt/preferences.d/aspnet <<'EOF'
-Package: aspnet*
-Pin: origin packages.microsoft.com
-Pin-Priority: 1001
-EOF"
-
 # SDK のインストール
-sudo apt-get update && sudo apt-get install -y dotnet-sdk-7.0=7.0.304-1
+sudo apt-get update
+sudo apt-get install -y ca-certificates libc6 libgcc-s1 libgssapi-krb5-2 libicu74 libssl3t64 libstdc++6 tzdata zlib1g
+wget -q https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+sudo bash dotnet-install.sh --version 7.0.304 --install-dir /usr/share/dotnet --no-path
+rm dotnet-install.sh
+sudo ln -s /usr/share/dotnet/dotnet /usr/local/bin/dotnet
 
 # カレントディレクトリーにプロジェクトファイルを設置
 cat > Main.vbproj << EOS
