@@ -1,0 +1,104 @@
+language = "Visual Basic"
+display = "Visual Basic 16.9 (.NET 7.0.7)"
+filename = "Main.vb"
+object = "publish/Main"
+compile = '''
+export DOTNET_EnableWriteXorExecute=0
+dotnet publish -c Release -o publish -v q --nologo 1>&2'''
+execution = ["./publish/Main"]
+install = '''
+# パッケージリポジトリの設定
+wget -q https://packages.microsoft.com/config/ubuntu/22.10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+sudo sh -c "cat > /etc/apt/preferences.d/dotnet <<'EOF'
+Package: dotnet*
+Pin: origin packages.microsoft.com
+Pin-Priority: 1001
+EOF"
+sudo sh -c "cat > /etc/apt/preferences.d/aspnet <<'EOF'
+Package: aspnet*
+Pin: origin packages.microsoft.com
+Pin-Priority: 1001
+EOF"
+
+# SDK のインストール
+sudo apt-get update && sudo apt-get install -y dotnet-sdk-7.0=7.0.304-1
+
+# カレントディレクトリーにプロジェクトファイルを設置
+cat > Main.vbproj << EOS
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <DefineConstants>ONLINE_JUDGE,ATCODER</DefineConstants>
+    <RuntimeIdentifier>ubuntu-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ac-library-csharp" Version="3.0.0-atcoder8" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ML" Version="2.0.1" />
+    <PackageReference Include="Microsoft.ML.LightGbm" Version="2.0.1" />
+  </ItemGroup>
+</Project>
+EOS
+
+# プロジェクトをリストア。あらかじめコンパイルを通してWJの短縮を試みる
+cat > Main.vb << EOS
+Imports System
+
+Module Program
+    Sub Main(args As String())
+        Console.WriteLine("Hello World!")
+    End Sub
+End Module
+EOS
+export DOTNET_EnableWriteXorExecute=0
+dotnet publish -c Release -o tmp -v q --nologo 1>&2
+rm Main.vb'''
+
+[environment]
+DOTNET_EnableWriteXorExecute = "0"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/dotnet/sdk/blob/main/LICENSE.TXT"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/dotnet/runtime/blob/main/LICENSE.TXT"
+
+[[license]]
+name = "MIT"
+url = "https://github.com/dotnet/roslyn/blob/main/License.txt"
+
+[library.ac-library-csharp]
+version = "3.0.0-atcoder8"
+
+[[library.ac-library-csharp.license]]
+name = "CC0-1.0"
+url = "https://github.com/kzrnm/ac-library-csharp/blob/main/Source/ac-library-csharp/LICENSE"
+
+[library."MathNet.Numerics"]
+version = "5.0.0"
+
+[[library."MathNet.Numerics".license]]
+name = "MIT"
+url = "https://github.com/mathnet/mathnet-numerics/blob/master/LICENSE.md"
+
+[library."Microsoft.ML"]
+version = "2.0.1"
+
+[[library."Microsoft.ML".license]]
+name = "MIT"
+url = "https://github.com/dotnet/machinelearning/blob/main/LICENSE"
+
+[library."Microsoft.ML.LightGbm"]
+version = "2.0.1"
+
+[[library."Microsoft.ML.LightGbm".license]]
+name = "MIT"
+url = "https://github.com/dotnet/machinelearning/blob/main/LICENSE"
