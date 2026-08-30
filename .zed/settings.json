@@ -8,8 +8,7 @@
     "languages": {
         "Python": {
             "language_servers": [
-                "ruff",
-                "basedpyright"
+                "ruff"
             ],
             "formatter": {
                 "language_server": {
